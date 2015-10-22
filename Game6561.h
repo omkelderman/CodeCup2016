@@ -6,17 +6,19 @@
 #include <istream>
 #include <ostream>
 #include "Board.h"
+#include "Algorithm.h"
 #include <utility>
 
 class Game6561 {
 public:
-    Game6561(std::istream& istream, std::ostream& ostream);
+    Game6561(std::istream& istream, std::ostream& ostream, Algorithm& algorithm);
 
     void run();
 private:
     std::istream& istream;
     std::ostream& ostream;
     Board board;
+    Algorithm& algorithm;
 
     unsigned short moveCounter;
 

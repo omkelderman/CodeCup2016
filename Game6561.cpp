@@ -4,16 +4,17 @@
 
 #include <iostream>
 
-Game6561::Game6561(std::istream& istream, std::ostream& ostream) :
-        istream(istream), ostream(ostream), moveCounter(0) {
+Game6561::Game6561(std::istream& istream, std::ostream& ostream, Algorithm& algorithm) :
+        istream(istream), ostream(ostream), algorithm(algorithm), moveCounter(0) {
+    algorithm.setBoard(&board);
 }
 
 void Game6561::run() {
     char c;
     istream >> c;
-    if(c == 'A') {
+    if (c == 'A') {
         runPlayerA();
-    } else if(c == 'B') {
+    } else if (c == 'B') {
         runPlayerB();
     } else {
         ostream << "FUCKING CAIA WHATchU DOIN'???";
@@ -80,17 +81,25 @@ void Game6561::readSlide() {
 }
 
 void Game6561::placeBluePiece() {
-    //
+    const std::pair<coord, coord>& move = algorithm.calculateBlueMove();
+    board.setPiece(move.first, move.second, BLUE);
+    ostream << move.first << move.second;
 }
 
 void Game6561::placeRedPiece() {
-    //
+    const std::pair<coord, coord>& move = algorithm.calculateRedMove();
+    board.setPiece(move.first, move.second, RED);
+    ostream << move.first << move.second;
 }
 
 void Game6561::placeGreyPiece() {
-    //
+    const std::pair<coord, coord>& move = algorithm.calculateGreyMove();
+    board.setPiece(move.first, move.second, GREY);
+    ostream << move.first << move.second;
 }
 
 void Game6561::doSlide() {
-    //
+    SlideDirection move = algorithm.calculateSlide();
+    board.slide(move);
+    ostream << move;
 }
