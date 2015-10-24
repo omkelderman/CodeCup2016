@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "Game6561.h"
+#include "TestAlgorithm.h"
 
 int main() {
 //    Board board;
@@ -15,8 +16,9 @@ int main() {
 //    std::cout << board << std::endl;
 //    board.slide(UP);
 //    std::cout << board << std::endl;
+    TestAlgorithm algorithm;
     std::cerr << "START" << std::endl;
-    Game6561 game(std::cin, std::cout);
+    Game6561 game(std::cin, std::cout, algorithm);
     game.run();
     std::cerr << "END" << std::endl;
 
