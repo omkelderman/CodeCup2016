@@ -3,6 +3,9 @@
 #include <stdexcept>
 #include <iostream>
 
+Coords::Coords(coord row, coord column): row(row), column(column) {
+}
+
 std::ostream& operator<<(std::ostream& ostream, const SlideDirection& direction) {
     switch (direction) {
         case UP:
@@ -47,12 +50,12 @@ std::istream& operator>>(std::istream& istream, SlideDirection& direction) {
 Board::Board() {
 }
 
-Board& Board::setPiece(coord x, coord y, PieceColor color, unsigned short value /*= 1*/) {
-    if (!pieces[x][y].empty()) {
+Board& Board::setPiece(coord row, coord column, PieceColor color, unsigned short value /*= 1*/) {
+    if (!pieces[row][column].empty()) {
         throw std::logic_error("Piece already exists on this spot");
     }
-    pieces[x][y].value = value;
-    pieces[x][y].color = color;
+    pieces[row][column].value = value;
+    pieces[row][column].color = color;
     return *this;
 }
 
@@ -75,10 +78,10 @@ void Board::slide(SlideDirection direction) {
 
 std::ostream& operator<<(std::ostream& ostream, const Board& board) {
     ostream << "{|" << std::endl;
-    for (int y = 0; y < 4; ++y) {
+    for (int row = 0; row < 4; ++row) {
         ostream << " |";
-        for (int x = 0; x < 4; ++x) {
-            ostream << " " << board.pieces[x][y] << " |";
+        for (int column = 0; column < 4; ++column) {
+            ostream << " " << board.pieces[row][column] << " |";
         }
         ostream << std::endl;
     }
@@ -86,34 +89,34 @@ std::ostream& operator<<(std::ostream& ostream, const Board& board) {
     return ostream;
 }
 
-const Piece& Board::getPiece(coord x, coord y) const {
-    return pieces[x][y];
+const Piece& Board::getPiece(coord row, coord column) const {
+    return pieces[row][column];
 }
 
 void Board::slideUp() {
-    for (coord x = 0; x < 4; ++x) {
-        Piece* localPieces[] = {&(pieces[x][0]), &(pieces[x][1]), &(pieces[x][2]), &(pieces[x][3])};
+    for (coord column = 0; column < 4; ++column) {
+        Piece* localPieces[] = {&(pieces[0][column]), &(pieces[1][column]), &(pieces[2][column]), &(pieces[3][column])};
         slidePieces(localPieces);
     }
 }
 
 void Board::slideDown() {
-    for (coord x = 0; x < 4; ++x) {
-        Piece* localPieces[] = {&pieces[x][3], &pieces[x][2], &pieces[x][1], &pieces[x][0]};
+    for (coord column = 0; column < 4; ++column) {
+        Piece* localPieces[] = {&(pieces[3][column]), &(pieces[2][column]), &(pieces[1][column]), &(pieces[0][column])};
         slidePieces(localPieces);
     }
 }
 
 void Board::slideLeft() {
-    for (coord y = 0; y < 4; ++y) {
-        Piece* localPieces[] = {&pieces[0][y], &pieces[1][y], &pieces[2][y], &pieces[3][y]};
+    for (coord row = 0; row < 4; ++row) {
+        Piece* localPieces[] = {&pieces[row][0], &pieces[row][1], &pieces[row][2], &pieces[row][3]};
         slidePieces(localPieces);
     }
 }
 
 void Board::slideRight() {
-    for (coord y = 0; y < 4; ++y) {
-        Piece* localPieces[] = {&pieces[3][y], &pieces[2][y], &pieces[1][y], &pieces[0][y]};
+    for (coord row = 0; row < 4; ++row) {
+        Piece* localPieces[] = {&pieces[row][3], &pieces[row][2], &pieces[row][1], &pieces[row][0]};
         slidePieces(localPieces);
     }
 }

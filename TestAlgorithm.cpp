@@ -7,21 +7,21 @@
 TestAlgorithm::TestAlgorithm() :
         Algorithm() { }
 
-const std::pair<coord, coord> TestAlgorithm::calculateRedMove() const {
-    const std::pair<coord, coord>& redMove = getFirstEmpty();
-    std::cerr << "Red move: " << redMove.first << redMove.second << std::endl;
+const Coords TestAlgorithm::calculateRedMove() const {
+    const Coords& redMove = getFirstEmpty();
+    std::cerr << "Red move: " << redMove.row << redMove.column << std::endl;
     return redMove;
 }
 
-const std::pair<coord, coord> TestAlgorithm::calculateBlueMove() const {
-    const std::pair<coord, coord>& blueMove = getFirstEmpty();
-    std::cerr << "Blue move: " << blueMove.first << blueMove.second << std::endl;
+const Coords TestAlgorithm::calculateBlueMove() const {
+    const Coords& blueMove = getFirstEmpty();
+    std::cerr << "Blue move: " << blueMove.row << blueMove.column << std::endl;
     return blueMove;
 }
 
-const std::pair<coord, coord> TestAlgorithm::calculateGreyMove() const {
-    const std::pair<coord, coord>& greyMove = getFirstEmpty();
-    std::cerr << "Grey move: " << greyMove.first << greyMove.second << std::endl;
+const Coords TestAlgorithm::calculateGreyMove() const {
+    const Coords& greyMove = getFirstEmpty();
+    std::cerr << "Grey move: " << greyMove.row << greyMove.column << std::endl;
     return greyMove;
 }
 
@@ -36,30 +36,30 @@ const SlideDirection TestAlgorithm::calculateSlide() const {
     } else if (slideRightIsValid()) {
         dir = RIGHT;
     } else {
-        throw std::logic_error("No valid move possible");
+        throw std::logic_error("No valid slide possible");
     }
     std::cerr << "Slide direction: " << dir << std::endl;
     return dir;
 }
 
 bool TestAlgorithm::slideUpIsValid() const {
-    for (coord x = 0; x < 4; ++x) {
+    for (coord column = 0; column < 4; ++column) {
         bool hasEmpty = false;
-        for (coord y = 0; y < 4; ++y) {
+        for (coord row = 0; row < 4; ++row) {
             if (hasEmpty) {
-                if (!board->getPiece(x, y).empty()) {
+                if (!board->getPiece(row, column).empty()) {
                     return true;
                 }
             } else {
-                if (board->getPiece(x, y).empty()) {
+                if (board->getPiece(row, column).empty()) {
                     hasEmpty = true;
                 }
             }
         }
 
         unsigned short lastValue = 0;
-        for (coord y = 0; y < 4; ++y) {
-            const Piece& p = board->getPiece(x, y);
+        for (coord row = 0; row < 4; ++row) {
+            const Piece& p = board->getPiece(row, column);
             if (!p.empty() && p.value == lastValue) {
                 return true;
             }
@@ -70,23 +70,23 @@ bool TestAlgorithm::slideUpIsValid() const {
 }
 
 bool TestAlgorithm::slideDownIsValid() const {
-    for (coord x = 0; x < 4; ++x) {
+    for (coord column = 0; column < 4; ++column) {
         bool hasEmpty = false;
-        for (coord y = 3; y >= 0; --y) {
+        for (coord row = 3; row >= 0; --row) {
             if (hasEmpty) {
-                if (!board->getPiece(x, y).empty()) {
+                if (!board->getPiece(row, column).empty()) {
                     return true;
                 }
             } else {
-                if (board->getPiece(x, y).empty()) {
+                if (board->getPiece(row, column).empty()) {
                     hasEmpty = true;
                 }
             }
         }
 
         unsigned short lastValue = 0;
-        for (coord y = 3; y >= 0; --y) {
-            const Piece& p = board->getPiece(x, y);
+        for (coord row = 3; row >= 0; --row) {
+            const Piece& p = board->getPiece(row, column);
             if (!p.empty() && p.value == lastValue) {
                 return true;
             }
@@ -97,23 +97,23 @@ bool TestAlgorithm::slideDownIsValid() const {
 }
 
 bool TestAlgorithm::slideLeftIsValid() const {
-    for (coord y = 0; y < 4; ++y) {
+    for (coord row = 0; row < 4; ++row) {
         bool hasEmpty = false;
-        for (coord x = 0; x < 4; ++x) {
+        for (coord column = 0; column < 4; ++column) {
             if (hasEmpty) {
-                if (!board->getPiece(x, y).empty()) {
+                if (!board->getPiece(row, column).empty()) {
                     return true;
                 }
             } else {
-                if (board->getPiece(x, y).empty()) {
+                if (board->getPiece(row, column).empty()) {
                     hasEmpty = true;
                 }
             }
         }
 
         unsigned short lastValue = 0;
-        for (coord x = 0; x < 4; ++x) {
-            const Piece& p = board->getPiece(x, y);
+        for (coord column = 0; column < 4; ++column) {
+            const Piece& p = board->getPiece(row, column);
             if (!p.empty() && p.value == lastValue) {
                 return true;
             }
@@ -124,23 +124,23 @@ bool TestAlgorithm::slideLeftIsValid() const {
 }
 
 bool TestAlgorithm::slideRightIsValid() const {
-    for (coord y = 0; y < 4; ++y) {
+    for (coord row = 0; row < 4; ++row) {
         bool hasEmpty = false;
-        for (coord x = 3; x >= 0; --x) {
+        for (coord column = 3; column >= 0; --column) {
             if (hasEmpty) {
-                if (!board->getPiece(x, y).empty()) {
+                if (!board->getPiece(row, column).empty()) {
                     return true;
                 }
             } else {
-                if (board->getPiece(x, y).empty()) {
+                if (board->getPiece(row, column).empty()) {
                     hasEmpty = true;
                 }
             }
         }
 
         unsigned short lastValue = 0;
-        for (coord x = 3; x >= 0; --x) {
-            const Piece& p = board->getPiece(x, y);
+        for (coord column = 3; column >= 0; --column) {
+            const Piece& p = board->getPiece(row, column);
             if (!p.empty() && p.value == lastValue) {
                 return true;
             }
@@ -150,13 +150,13 @@ bool TestAlgorithm::slideRightIsValid() const {
     return false;
 }
 
-const std::pair<coord, coord> TestAlgorithm::getFirstEmpty() const {
-    for (coord y = 0; y < 3; ++y) {
-        for (coord x = 0; x < 3; ++x) {
-            if (board->getPiece(x, y).empty()) {
-                return std::make_pair(x, y);
+const Coords TestAlgorithm::getFirstEmpty() const {
+    for (coord row = 0; row < 3; ++row) {
+        for (coord column = 0; column < 3; ++column) {
+            if (board->getPiece(row, column).empty()) {
+                return Coords(row, column);
             }
         }
     }
-    throw std::logic_error("No valid move possible");
+    throw std::logic_error("No valid placement possible");
 }

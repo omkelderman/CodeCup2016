@@ -6,15 +6,15 @@
 MonteCarloAlgorithm::MonteCarloAlgorithm() :
         Algorithm() { }
 
-const std::pair<coord, coord> MonteCarloAlgorithm::calculateRedMove() const {
+const Coords MonteCarloAlgorithm::calculateRedMove() const {
     throw std::logic_error("Not implemented");
 }
 
-const std::pair<coord, coord> MonteCarloAlgorithm::calculateBlueMove() const {
+const Coords MonteCarloAlgorithm::calculateBlueMove() const {
     throw std::logic_error("Not implemented");
 }
 
-const std::pair<coord, coord> MonteCarloAlgorithm::calculateGreyMove() const {
+const Coords MonteCarloAlgorithm::calculateGreyMove() const {
     throw std::logic_error("Not implemented");
 }
 

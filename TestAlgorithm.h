@@ -10,11 +10,11 @@ class TestAlgorithm : public Algorithm {
 public:
     TestAlgorithm();
 
-    virtual const std::pair<coord, coord> calculateRedMove() const;
-    virtual const std::pair<coord, coord> calculateBlueMove() const;
-    virtual const std::pair<coord, coord> calculateGreyMove() const;
+    virtual const Coords calculateRedMove() const;
+    virtual const Coords calculateBlueMove() const;
+    virtual const Coords calculateGreyMove() const;
     virtual const SlideDirection calculateSlide() const;
-    const std::pair<coord, coord> getFirstEmpty() const;
+    const Coords getFirstEmpty() const;
     bool slideUpIsValid() const;
     bool slideDownIsValid() const;
     bool slideLeftIsValid() const;

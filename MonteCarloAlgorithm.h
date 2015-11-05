@@ -10,9 +10,9 @@ class MonteCarloAlgorithm : public Algorithm {
 public:
     MonteCarloAlgorithm();
 
-    virtual const std::pair<coord, coord> calculateRedMove() const;
-    virtual const std::pair<coord, coord> calculateBlueMove() const;
-    virtual const std::pair<coord, coord> calculateGreyMove() const;
+    virtual const Coords calculateRedMove() const;
+    virtual const Coords calculateBlueMove() const;
+    virtual const Coords calculateGreyMove() const;
     virtual const SlideDirection calculateSlide() const;
 };
 

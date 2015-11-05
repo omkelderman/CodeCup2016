@@ -64,29 +64,28 @@ void Game6561::runPlayerB() {
 }
 
 void Game6561::readBluePiece() {
-    const std::pair<coord, coord>& xy = readCoords();
-    board.setPiece(xy.first, xy.second, BLUE);
+    const Coords& xy = readCoords();
+    board.setPiece(xy.row, xy.column, BLUE);
 }
 
 void Game6561::readRedPiece() {
-    const std::pair<coord, coord>& xy = readCoords();
-    board.setPiece(xy.first, xy.second, RED);
+    const Coords& xy = readCoords();
+    board.setPiece(xy.row, xy.column, RED);
 }
 
 void Game6561::readGreyPiece() {
-    const std::pair<coord, coord>& xy = readCoords();
-    board.setPiece(xy.first, xy.second, GREY);
+    const Coords& xy = readCoords();
+    board.setPiece(xy.row, xy.column, GREY);
 }
 
-const std::pair<coord, coord> Game6561::readCoords() {
+const Coords Game6561::readCoords() {
     std::string line = readLine(2);
     if(line[0] < '1' || line[0] > '4' || line[1] < '1' || line[1] > '4'){
         throw std::logic_error("Invalid coords given! Line: " + line);
     }
-    coord x = (coord) (line[0] - '1');
-    coord y = (coord) (line[1] - '1');
-
-    return std::make_pair(x, y);
+    coord row = (coord) (line[0] - '1');
+    coord column = (coord) (line[1] - '1');
+    return Coords(row, column);
 }
 
 void Game6561::readSlide() {
@@ -113,20 +112,20 @@ void Game6561::readSlide() {
 }
 
 void Game6561::placeBluePiece() {
-    const std::pair<coord, coord>& move = algorithm.calculateBlueMove();
-    board.setPiece(move.first, move.second, BLUE);
+    const Coords& move = algorithm.calculateBlueMove();
+    board.setPiece(move.row, move.column, BLUE);
     writeCoords(move);
 }
 
 void Game6561::placeRedPiece() {
-    const std::pair<coord, coord>& move = algorithm.calculateRedMove();
-    board.setPiece(move.first, move.second, RED);
+    const Coords& move = algorithm.calculateRedMove();
+    board.setPiece(move.row, move.column, RED);
     writeCoords(move);
 }
 
 void Game6561::placeGreyPiece() {
-    const std::pair<coord, coord>& move = algorithm.calculateGreyMove();
-    board.setPiece(move.first, move.second, GREY);
+    const Coords& move = algorithm.calculateGreyMove();
+    board.setPiece(move.row, move.column, GREY);
     writeCoords(move);
 }
 
@@ -149,6 +148,6 @@ std::string Game6561::readLine(std::size_t expectedLength /*= 1*/) {
     return line;
 }
 
-void Game6561::writeCoords(const std::pair<coord, coord>& coords) {
-    ostream << coords.first + 1 << coords.second + 1 << std::endl;
+void Game6561::writeCoords(const Coords& coords) {
+    ostream << coords.row + 1 << coords.column + 1 << std::endl;
 }

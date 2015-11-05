@@ -7,6 +7,13 @@
 
 typedef unsigned char coord;
 
+struct Coords {
+    coord row;
+    coord column;
+
+    Coords(coord row, coord column);
+};
+
 enum SlideDirection {
     UP, DOWN, LEFT, RIGHT
 };
@@ -18,13 +25,16 @@ class Board {
 public:
     Board();
 
-    Board& setPiece(coord x, coord y, PieceColor color, unsigned short value = 1);
+    Board& setPiece(coord row, coord column, PieceColor color, unsigned short value = 1);
 
     friend std::ostream& operator<<(std::ostream& ostream, const Board& board);
 
     void slide(SlideDirection direction);
-    const Piece& getPiece(coord x, coord y) const;
+    const Piece& getPiece(coord row, coord column) const;
 private:
+    /**
+     * pieces[rows][columns]
+     */
     Piece pieces[4][4];
     void slideUp();
     void slideDown();
