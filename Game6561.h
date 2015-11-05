@@ -28,13 +28,16 @@ private:
     void readBluePiece();
     void readRedPiece();
     void readGreyPiece();
-    const std::pair<coord, coord> readCoords() const;
+    const std::pair<coord, coord> readCoords();
     void readSlide();
+    std::string readLine(std::size_t expectedLength = 1);
 
     void placeBluePiece();
     void placeRedPiece();
     void placeGreyPiece();
     void doSlide();
+    void writeCoords(const std::pair<coord, coord>& coords);
+    void printBoard();
 };
 
 

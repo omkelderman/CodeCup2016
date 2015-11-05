@@ -1,5 +1,6 @@
 #include "Board.h"
 
+#include <stdexcept>
 #include <iostream>
 
 std::ostream& operator<<(std::ostream& ostream, const SlideDirection& direction) {
@@ -48,7 +49,7 @@ Board::Board() {
 
 Board& Board::setPiece(coord x, coord y, PieceColor color, unsigned short value /*= 1*/) {
     if (!pieces[x][y].empty()) {
-        throw "SHUT THE FUCK UP";
+        throw std::logic_error("SHUT THE FUCK UP");
     }
     pieces[x][y].value = value;
     pieces[x][y].color = color;
