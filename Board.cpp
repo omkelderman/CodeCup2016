@@ -49,7 +49,7 @@ Board::Board() {
 
 Board& Board::setPiece(coord x, coord y, PieceColor color, unsigned short value /*= 1*/) {
     if (!pieces[x][y].empty()) {
-        throw std::logic_error("SHUT THE FUCK UP");
+        throw std::logic_error("Piece already exists on this spot");
     }
     pieces[x][y].value = value;
     pieces[x][y].color = color;

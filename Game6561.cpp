@@ -83,8 +83,8 @@ const std::pair<coord, coord> Game6561::readCoords() {
     if(line[0] < '1' || line[0] > '4' || line[1] < '1' || line[1] > '4'){
         throw std::logic_error("Invalid coords given! Line: " + line);
     }
-    coord y = (coord) (line[0] - '1');
-    coord x = (coord) (line[1] - '1');
+    coord x = (coord) (line[0] - '1');
+    coord y = (coord) (line[1] - '1');
 
     return std::make_pair(x, y);
 }
@@ -144,7 +144,7 @@ std::string Game6561::readLine(std::size_t expectedLength /*= 1*/) {
     std::string line;
     std::getline(istream, line);
     if(line.size() != expectedLength){
-        throw std::logic_error("Line is not of the expected length");
+        throw std::logic_error("Line is not of the expected length: " + line);
     }
     return line;
 }

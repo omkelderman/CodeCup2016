@@ -1,37 +1,45 @@
 //
 
 #include <stdexcept>
+#include <iostream>
 #include "TestAlgorithm.h"
 
 TestAlgorithm::TestAlgorithm() :
         Algorithm() { }
 
 const std::pair<coord, coord> TestAlgorithm::calculateRedMove() const {
-    return getFirstEmpty();
+    const std::pair<coord, coord>& redMove = getFirstEmpty();
+    std::cerr << "Red move: " << redMove.first << redMove.second << std::endl;
+    return redMove;
 }
 
 const std::pair<coord, coord> TestAlgorithm::calculateBlueMove() const {
-    return getFirstEmpty();
+    const std::pair<coord, coord>& blueMove = getFirstEmpty();
+    std::cerr << "Blue move: " << blueMove.first << blueMove.second << std::endl;
+    return blueMove;
 }
 
 const std::pair<coord, coord> TestAlgorithm::calculateGreyMove() const {
-    return getFirstEmpty();
+    const std::pair<coord, coord>& greyMove = getFirstEmpty();
+    std::cerr << "Grey move: " << greyMove.first << greyMove.second << std::endl;
+    return greyMove;
 }
 
 const SlideDirection TestAlgorithm::calculateSlide() const {
+    SlideDirection dir;
     if (slideUpIsValid()) {
-        return UP;
+        dir = UP;
+    } else if (slideDownIsValid()) {
+        dir = DOWN;
+    } else if (slideLeftIsValid()) {
+        dir = LEFT;
+    } else if (slideRightIsValid()) {
+        dir = RIGHT;
+    } else {
+        throw std::logic_error("No valid move possible");
     }
-    if (slideDownIsValid()) {
-        return DOWN;
-    }
-    if (slideLeftIsValid()) {
-        return LEFT;
-    }
-    if (slideRightIsValid()) {
-        return RIGHT;
-    }
-    throw std::logic_error("No valid move possible");
+    std::cerr << "Slide direction: " << dir << std::endl;
+    return dir;
 }
 
 bool TestAlgorithm::slideUpIsValid() const {
