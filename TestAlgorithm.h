@@ -13,7 +13,7 @@ public:
     virtual const Coords calculateRedMove() const;
     virtual const Coords calculateBlueMove() const;
     virtual const Coords calculateGreyMove() const;
-    virtual const SlideDirection calculateSlide() const;
+    virtual SlideDirection calculateSlide() const;
     const Coords getFirstEmpty() const;
     bool slideUpIsValid() const;
     bool slideDownIsValid() const;

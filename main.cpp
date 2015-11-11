@@ -9,7 +9,7 @@ int main() {
     try {
         TestAlgorithm algorithm;
         std::cerr << "START" << std::endl;
-        Game6561 game(std::cin, std::cout, algorithm);
+        Game6561 game(std::cin, std::cout, std::cerr, algorithm);
         game.run();
         std::cerr << "END" << std::endl;
     } catch (const std::exception& e){

@@ -31,16 +31,16 @@ public:
     friend std::ostream& operator<<(std::ostream& ostream, const Board& board);
 
     void slide(SlideDirection direction);
+    void slideUp();
+    void slideDown();
+    void slideLeft();
+    void slideRight();
     const Piece& getPiece(coord row, coord column) const;
 private:
     /**
      * pieces[rows][columns]
      */
     Piece pieces[4][4];
-    void slideUp();
-    void slideDown();
-    void slideLeft();
-    void slideRight();
 
     /**
      * Array-size should be 4

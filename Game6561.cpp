@@ -1,160 +1,155 @@
-//
-
 #include "Game6561.h"
-
-#include <iostream>
-#include <stdexcept>
 #include "GameException.h"
 
-Game6561::Game6561(std::istream& istream, std::ostream& ostream, Algorithm& algorithm) :
-        istream(istream), ostream(ostream), algorithm(algorithm), moveCounter(0) {
+GameRhythmState& operator++(GameRhythmState& gameRhythmState) {
+    switch(gameRhythmState) {
+        case GR_BLUE:
+            gameRhythmState = GR_RED;
+            break;
+        case GR_RED:
+            gameRhythmState = GR_GREY;
+            break;
+        case GR_GREY:
+            gameRhythmState = GR_SLIDE1;
+            break;
+        case GR_SLIDE1:
+            gameRhythmState = GR_SLIDE2;
+            break;
+        case GR_SLIDE2:
+            gameRhythmState = GR_BLUE;
+            break;
+    }
+    return gameRhythmState;
+}
+
+GameRhythmState operator++(GameRhythmState& gameRhythmState, int) {
+    GameRhythmState tmp = gameRhythmState;
+    ++gameRhythmState;
+    return tmp;
+}
+
+Game6561::Game6561(std::istream& istream, std::ostream& ostream, std::ostream& logStream, Algorithm& algorithm) :
+        istream(istream), ostream(ostream), logStream(logStream), algorithm(algorithm), gameRhythmState(GR_BLUE), moveCounter(0) {
     algorithm.setBoard(&board);
 }
 
 void Game6561::run() {
-    try {
-        char c = readLine()[0];
-        if (c == 'A') {
-            runPlayerA();
-        } else if (c == 'B') {
-            runPlayerB();
-        } else {
-            throw std::domain_error("No valid begin found!");
+    readNextLine();
+    if(nextLine[0] == 'A') {
+        doMove();
+#ifdef DO_DEBUG_LOG
+        printBoard();
+#endif
+    }
+    while(readNextLine()) {
+        parseNextLine();
+#ifdef DO_DEBUG_LOG
+        printBoard();
+#endif
+        doMove();
+#ifdef DO_DEBUG_LOG
+        printBoard();
+#endif
+    }
+}
+
+bool Game6561::readNextLine() {
+    std::getline(istream, nextLine);
+    return nextLine != "Quit";
+}
+
+void Game6561::parseNextLine() {
+    switch(gameRhythmState++){
+        case GR_BLUE: {
+            const Coords& coords = readCoords();
+            board.setPiece(coords.row, coords.column, BLUE);
+            break;
         }
-    } catch (const GameException& e) {
-        std::cerr << "Game ended: " << e.what() << std::endl;
+        case GR_RED: {
+            const Coords& coords = readCoords();
+            board.setPiece(coords.row, coords.column, RED);
+            break;
+        }
+        case GR_GREY: {
+            const Coords& coords = readCoords();
+            board.setPiece(coords.row, coords.column, GREY);
+            break;
+        }
+        case GR_SLIDE1:
+        case GR_SLIDE2:
+            readSlide();
+            break;
     }
-    std::string line = readLine(0);
-    std::cerr << "end of program, line received: " << line << std::endl;
-}
-
-void Game6561::runPlayerA() {
-    std::cerr << "Start player A" << std::endl;
-    for (moveCounter = 0; moveCounter < 1000; ) {
-        placeBluePiece();
-        printBoard();
-        readRedPiece();
-        printBoard();
-        placeGreyPiece();
-        printBoard();
-        readSlide();
-        printBoard();
-        doSlide();
-        printBoard();
-        readBluePiece();
-        printBoard();
-        placeRedPiece();
-        printBoard();
-        readGreyPiece();
-        printBoard();
-        doSlide();
-        printBoard();
-        readSlide();
-        printBoard();
-    }
-}
-
-void Game6561::runPlayerB() {
-    std::cerr << "Start player B" << std::endl;
-    for (moveCounter = 0; moveCounter < 1000; ) {
-        readBluePiece();
-        placeRedPiece();
-        readGreyPiece();
-        doSlide();
-        readSlide();
-        placeBluePiece();
-        readRedPiece();
-        placeGreyPiece();
-        readSlide();
-        doSlide();
-    }
-}
-
-void Game6561::readBluePiece() {
-    const Coords& xy = readCoords();
-    board.setPiece(xy.row, xy.column, BLUE);
-}
-
-void Game6561::readRedPiece() {
-    const Coords& xy = readCoords();
-    board.setPiece(xy.row, xy.column, RED);
-}
-
-void Game6561::readGreyPiece() {
-    const Coords& xy = readCoords();
-    board.setPiece(xy.row, xy.column, GREY);
-}
-
-const Coords Game6561::readCoords() {
-    std::string line = readLine(2);
-    if(line[0] < '1' || line[0] > '4' || line[1] < '1' || line[1] > '4'){
-        throw std::domain_error("Could not read valid coords! Line: " + line);
-    }
-    coord row = (coord) (line[0] - '1');
-    coord column = (coord) (line[1] - '1');
-    return Coords(row, column);
+    ++moveCounter;
 }
 
 void Game6561::readSlide() {
-    std::string line = readLine();
-    SlideDirection direction;
-    switch (line[0]) {
+    switch (nextLine[0]) {
         case 'U':
-            direction = UP;
+            board.slideUp();
             break;
         case 'D':
-            direction = DOWN;
+            board.slideDown();
             break;
         case 'L':
-            direction = LEFT;
+            board.slideLeft();
             break;
         case 'R':
-            direction = RIGHT;
+            board.slideRight();
             break;
-        default:
-            throw std::domain_error("Could not read valid slide! Line: " + line);
-
+        default:break;
     }
-    board.slide(direction);
 }
 
-void Game6561::placeBluePiece() {
-    const Coords& move = algorithm.calculateBlueMove();
-    board.setPiece(move.row, move.column, BLUE);
-    writeCoords(move);
+const Coords Game6561::readCoords() {
+    coord row = (coord) (nextLine[0] - '1');
+    coord column = (coord) (nextLine[1] - '1');
+    return Coords(row, column);
 }
 
-void Game6561::placeRedPiece() {
-    const Coords& move = algorithm.calculateRedMove();
-    board.setPiece(move.row, move.column, RED);
-    writeCoords(move);
-}
-
-void Game6561::placeGreyPiece() {
-    const Coords& move = algorithm.calculateGreyMove();
-    board.setPiece(move.row, move.column, GREY);
-    writeCoords(move);
-}
-
-void Game6561::doSlide() {
-    SlideDirection move = algorithm.calculateSlide();
-    board.slide(move);
-    ostream << move << std::endl;
-}
-
-void Game6561::printBoard() {
-    std::cerr << moveCounter++ << ": " << board << std::endl;
-}
-
-std::string Game6561::readLine(std::size_t expectedLength /*= 1*/) {
-    std::string line;
-    std::getline(istream, line);
-    if(expectedLength != 0 && line.size() != expectedLength){
-        throw std::domain_error("Line is not of the expected length: " + line);
+void Game6561::doMove() {
+    if(moveCounter >= MAX_MOVES) {
+        logStream << "Max moves reached: " << std::endl;
+        return;
     }
-    return line;
+
+    try {
+        switch (gameRhythmState++) {
+            case GR_BLUE: {
+                const Coords& coords = algorithm.calculateBlueMove();
+                board.setPiece(coords.row, coords.column, BLUE);
+                writeCoords(coords);
+                break;
+            }
+            case GR_RED: {
+                const Coords& coords = algorithm.calculateRedMove();
+                board.setPiece(coords.row, coords.column, RED);
+                writeCoords(coords);
+                break;
+            }
+            case GR_GREY: {
+                const Coords& coords = algorithm.calculateGreyMove();
+                board.setPiece(coords.row, coords.column, GREY);
+                writeCoords(coords);
+                break;
+            }
+            case GR_SLIDE1:
+            case GR_SLIDE2:
+                SlideDirection slideDirection = algorithm.calculateSlide();
+                board.slide(slideDirection);
+                ostream << slideDirection << std::endl;
+                break;
+        }
+    } catch (const GameException& e) {
+        logStream << "Impossible move detected: " << e.what() << std::endl;
+    }
+    ++moveCounter;
 }
 
 void Game6561::writeCoords(const Coords& coords) {
     ostream << coords.row + 1 << coords.column + 1 << std::endl;
+}
+
+void Game6561::printBoard() {
+    logStream << moveCounter << ": " << board << std::endl;
 }

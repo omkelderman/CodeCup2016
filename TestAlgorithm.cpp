@@ -26,7 +26,7 @@ const Coords TestAlgorithm::calculateGreyMove() const {
     return greyMove;
 }
 
-const SlideDirection TestAlgorithm::calculateSlide() const {
+SlideDirection TestAlgorithm::calculateSlide() const {
     SlideDirection dir;
     if (slideUpIsValid()) {
         dir = UP;
@@ -73,7 +73,7 @@ bool TestAlgorithm::slideUpIsValid() const {
 bool TestAlgorithm::slideDownIsValid() const {
     for (coord column = 0; column < 4; ++column) {
         bool hasEmpty = false;
-        for (coord row = 3; row >= 0; --row) {
+        for (coord row = 4; row-- > 0; ) {
             if (hasEmpty) {
                 if (!board->getPiece(row, column).empty()) {
                     return true;
@@ -86,7 +86,7 @@ bool TestAlgorithm::slideDownIsValid() const {
         }
 
         unsigned short lastValue = 0;
-        for (coord row = 3; row >= 0; --row) {
+        for (coord row = 4; row-- > 0; ) {
             const Piece& p = board->getPiece(row, column);
             if (!p.empty() && p.value == lastValue) {
                 return true;
@@ -127,7 +127,7 @@ bool TestAlgorithm::slideLeftIsValid() const {
 bool TestAlgorithm::slideRightIsValid() const {
     for (coord row = 0; row < 4; ++row) {
         bool hasEmpty = false;
-        for (coord column = 3; column >= 0; --column) {
+        for (coord column = 4; column-- > 0;) {
             if (hasEmpty) {
                 if (!board->getPiece(row, column).empty()) {
                     return true;
@@ -140,7 +140,7 @@ bool TestAlgorithm::slideRightIsValid() const {
         }
 
         unsigned short lastValue = 0;
-        for (coord column = 3; column >= 0; --column) {
+        for (coord column = 4; column-- > 0; ) {
             const Piece& p = board->getPiece(row, column);
             if (!p.empty() && p.value == lastValue) {
                 return true;
