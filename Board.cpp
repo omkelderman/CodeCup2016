@@ -57,7 +57,7 @@ Board::Board() {
 
 Board& Board::setPiece(coord row, coord column, PieceColor color, unsigned short value /*= 1*/) {
     if (!pieces[row][column].empty()) {
-        throw std::logic_error("Piece already exists on this spot");
+        throw std::invalid_argument("Piece already exists on this spot");
     }
     pieces[row][column].value = value;
     pieces[row][column].color = color;

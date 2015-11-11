@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <iostream>
 #include "TestAlgorithm.h"
+#include "GameException.h"
 
 TestAlgorithm::TestAlgorithm() :
         Algorithm() { }
@@ -36,7 +37,7 @@ const SlideDirection TestAlgorithm::calculateSlide() const {
     } else if (slideRightIsValid()) {
         dir = RIGHT;
     } else {
-        throw std::logic_error("No valid slide possible");
+        throw GameException("No valid slide possible");
     }
     std::cerr << "Slide direction: " << dir << std::endl;
     return dir;
@@ -158,5 +159,5 @@ const Coords TestAlgorithm::getFirstEmpty() const {
             }
         }
     }
-    throw std::logic_error("No first empty found");
+    throw GameException("No first empty found");
 }

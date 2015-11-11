@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include "GameException.h"
 
 Game6561::Game6561(std::istream& istream, std::ostream& ostream, Algorithm& algorithm) :
         istream(istream), ostream(ostream), algorithm(algorithm), moveCounter(0) {
@@ -18,10 +19,10 @@ void Game6561::run() {
         } else if (c == 'B') {
             runPlayerB();
         } else {
-            throw std::logic_error("No valid begin found!");
+            throw std::domain_error("No valid begin found!");
         }
-    } catch (const std::exception& e) {
-        std::cerr << "Halp, exception kutjes: " << e.what() << std::endl;
+    } catch (const GameException& e) {
+        std::cerr << "Game ended: " << e.what() << std::endl;
     }
     std::string line = readLine(0);
     std::cerr << "end of program, line received: " << line << std::endl;
@@ -87,7 +88,7 @@ void Game6561::readGreyPiece() {
 const Coords Game6561::readCoords() {
     std::string line = readLine(2);
     if(line[0] < '1' || line[0] > '4' || line[1] < '1' || line[1] > '4'){
-        throw std::logic_error("Invalid coords given! Line: " + line);
+        throw std::domain_error("Could not read valid coords! Line: " + line);
     }
     coord row = (coord) (line[0] - '1');
     coord column = (coord) (line[1] - '1');
@@ -111,7 +112,7 @@ void Game6561::readSlide() {
             direction = RIGHT;
             break;
         default:
-            throw std::logic_error("Invalid slide! Line: " + line);
+            throw std::domain_error("Could not read valid slide! Line: " + line);
 
     }
     board.slide(direction);
@@ -149,7 +150,7 @@ std::string Game6561::readLine(std::size_t expectedLength /*= 1*/) {
     std::string line;
     std::getline(istream, line);
     if(expectedLength != 0 && line.size() != expectedLength){
-        throw std::logic_error("Line is not of the expected length: " + line);
+        throw std::domain_error("Line is not of the expected length: " + line);
     }
     return line;
 }

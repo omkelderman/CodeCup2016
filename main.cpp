@@ -12,8 +12,8 @@ int main() {
         Game6561 game(std::cin, std::cout, algorithm);
         game.run();
         std::cerr << "END" << std::endl;
-    } catch (const std::logic_error& e){
-        std::cerr << "Halp, exception kutjes: " << e.what() << std::endl;
+    } catch (const std::exception& e){
+        std::cerr << "Halp, exception: " << e.what() << std::endl;
     }
 
     return 0;
