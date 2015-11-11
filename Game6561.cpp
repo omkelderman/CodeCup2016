@@ -11,14 +11,20 @@ Game6561::Game6561(std::istream& istream, std::ostream& ostream, Algorithm& algo
 }
 
 void Game6561::run() {
-    char c = readLine()[0];
-    if (c == 'A') {
-        runPlayerA();
-    } else if (c == 'B') {
-        runPlayerB();
-    } else {
-        throw std::logic_error("No valid begin found!");
+    try {
+        char c = readLine()[0];
+        if (c == 'A') {
+            runPlayerA();
+        } else if (c == 'B') {
+            runPlayerB();
+        } else {
+            throw std::logic_error("No valid begin found!");
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Halp, exception kutjes: " << e.what() << std::endl;
     }
+    std::string line = readLine(0);
+    std::cerr << "end of program, line received: " << line << std::endl;
 }
 
 void Game6561::runPlayerA() {
@@ -142,7 +148,7 @@ void Game6561::printBoard() {
 std::string Game6561::readLine(std::size_t expectedLength /*= 1*/) {
     std::string line;
     std::getline(istream, line);
-    if(line.size() != expectedLength){
+    if(expectedLength != 0 && line.size() != expectedLength){
         throw std::logic_error("Line is not of the expected length: " + line);
     }
     return line;

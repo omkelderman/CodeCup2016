@@ -30,6 +30,9 @@ private:
     void readGreyPiece();
     const Coords readCoords();
     void readSlide();
+    /**
+     * expectedLength of 0 equals no check
+     */
     std::string readLine(std::size_t expectedLength = 1);
 
     void placeBluePiece();

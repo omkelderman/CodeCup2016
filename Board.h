@@ -18,6 +18,7 @@ enum SlideDirection {
     UP, DOWN, LEFT, RIGHT
 };
 
+std::ostream& operator<<(std::ostream& ostream, const Coords& coords);
 std::ostream& operator<<(std::ostream& ostream, const SlideDirection& direction);
 std::istream& operator>>(std::istream& istream, SlideDirection& direction);
 

@@ -6,6 +6,11 @@
 Coords::Coords(coord row, coord column): row(row), column(column) {
 }
 
+std::ostream& operator<<(std::ostream& ostream, const Coords& coords) {
+    ostream << '[' << ((int) coords.row) << ',' << ((int) coords.column) << ']';
+    return ostream;
+}
+
 std::ostream& operator<<(std::ostream& ostream, const SlideDirection& direction) {
     switch (direction) {
         case UP:

@@ -9,19 +9,19 @@ TestAlgorithm::TestAlgorithm() :
 
 const Coords TestAlgorithm::calculateRedMove() const {
     const Coords& redMove = getFirstEmpty();
-    std::cerr << "Red move: " << redMove.row << redMove.column << std::endl;
+    std::cerr << "Red move: " << redMove << std::endl;
     return redMove;
 }
 
 const Coords TestAlgorithm::calculateBlueMove() const {
     const Coords& blueMove = getFirstEmpty();
-    std::cerr << "Blue move: " << blueMove.row << blueMove.column << std::endl;
+    std::cerr << "Blue move: " << blueMove << std::endl;
     return blueMove;
 }
 
 const Coords TestAlgorithm::calculateGreyMove() const {
     const Coords& greyMove = getFirstEmpty();
-    std::cerr << "Grey move: " << greyMove.row << greyMove.column << std::endl;
+    std::cerr << "Grey move: " << greyMove << std::endl;
     return greyMove;
 }
 
@@ -151,12 +151,12 @@ bool TestAlgorithm::slideRightIsValid() const {
 }
 
 const Coords TestAlgorithm::getFirstEmpty() const {
-    for (coord row = 0; row < 3; ++row) {
-        for (coord column = 0; column < 3; ++column) {
+    for (coord row = 0; row < 4; ++row) {
+        for (coord column = 0; column < 4; ++column) {
             if (board->getPiece(row, column).empty()) {
                 return Coords(row, column);
             }
         }
     }
-    throw std::logic_error("No valid placement possible");
+    throw std::logic_error("No first empty found");
 }

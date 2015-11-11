@@ -20,7 +20,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-
 ### C++ ###
 # Compiled Object files
 *.slo
@@ -109,3 +108,5 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 
+### Own shit ###
+/Build
