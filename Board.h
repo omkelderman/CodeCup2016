@@ -1,5 +1,3 @@
-//
-
 #ifndef CODECUP_BOARD_H
 #define CODECUP_BOARD_H
 

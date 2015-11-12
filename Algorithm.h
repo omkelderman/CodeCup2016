@@ -1,5 +1,3 @@
-//
-
 #ifndef CODECUP_ALGORITHM_H
 #define CODECUP_ALGORITHM_H
 

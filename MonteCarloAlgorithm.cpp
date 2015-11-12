@@ -1,5 +1,3 @@
-//
-
 #include <stdexcept>
 #include "MonteCarloAlgorithm.h"
 

@@ -1,5 +1,3 @@
-//
-
 #ifndef CODECUP_PIECE_H
 #define CODECUP_PIECE_H
 

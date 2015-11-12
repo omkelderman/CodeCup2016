@@ -1,5 +1,3 @@
-//
-
 #ifndef CODECUP_GAME6561_H
 #define CODECUP_GAME6561_H
 
