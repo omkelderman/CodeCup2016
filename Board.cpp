@@ -23,7 +23,7 @@ std::ostream& operator<<(std::ostream& ostream, const SlideDirection& direction)
             ostream << 'L';
             break;
         case RIGHT:
-            ostream << 'E';
+            ostream << 'R';
             break;
     }
     return ostream;
