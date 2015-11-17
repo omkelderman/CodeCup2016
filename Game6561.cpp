@@ -23,14 +23,29 @@ GameRhythmState& operator++(GameRhythmState& gameRhythmState) {
 }
 
 GameRhythmState operator++(GameRhythmState& gameRhythmState, int) {
-    GameRhythmState tmp = gameRhythmState;
+    GameRhythmState tmp(gameRhythmState);
     ++gameRhythmState;
     return tmp;
 }
 
+
+GameState::GameState() :
+        moveCounter(0), gameRhythmState(GR_BLUE) { }
+
+GameState& GameState::operator++() {
+    ++moveCounter;
+    ++gameRhythmState;
+    return *this;
+}
+
+GameState GameState::operator++(int) {
+    GameState tmp(*this);
+    operator++();
+    return tmp;
+}
+
 Game6561::Game6561(std::istream& istream, std::ostream& ostream, std::ostream& logStream, Algorithm& algorithm) :
-        istream(istream), ostream(ostream), logStream(logStream), algorithm(algorithm), gameRhythmState(GR_BLUE),
-        moveCounter(0) {
+        istream(istream), ostream(ostream), logStream(logStream), algorithm(algorithm) {
     algorithm.setBoard(&board);
 }
 
@@ -60,7 +75,7 @@ bool Game6561::readNextLine() {
 }
 
 void Game6561::parseNextLine() {
-    switch (gameRhythmState++) {
+    switch (gameState.getGameRhythmState()) {
         case GR_BLUE:
             readPiece(BLUE);
             break;
@@ -75,7 +90,7 @@ void Game6561::parseNextLine() {
             readSlide();
             break;
     }
-    ++moveCounter;
+    ++gameState;
 }
 
 void Game6561::readPiece(PieceColor color) {
@@ -109,13 +124,13 @@ const Coords Game6561::readCoords() {
 }
 
 void Game6561::doMove() {
-    if (moveCounter >= MAX_MOVES) {
+    if (gameState.getMoveCounter() >= MAX_MOVES) {
         logStream << "Max moves reached: " << std::endl;
         return;
     }
 
     try {
-        switch (gameRhythmState++) {
+        switch (gameState.getGameRhythmState()) {
             case GR_BLUE: {
                 const Coords& coords = algorithm.calculateBlueMove();
                 board.setPiece(coords.row, coords.column, BLUE);
@@ -144,7 +159,7 @@ void Game6561::doMove() {
     } catch (const GameException& e) {
         logStream << "Impossible move detected: " << e.what() << std::endl;
     }
-    ++moveCounter;
+    ++gameState;
 }
 
 void Game6561::writeCoords(const Coords& coords) {
@@ -152,5 +167,13 @@ void Game6561::writeCoords(const Coords& coords) {
 }
 
 void Game6561::printBoard() {
-    logStream << moveCounter << ": " << board << std::endl;
+    logStream << gameState.getMoveCounter() << ": " << board << std::endl;
+}
+
+unsigned short GameState::getMoveCounter() const {
+    return moveCounter;
+}
+
+GameRhythmState GameState::getGameRhythmState() const {
+    return gameRhythmState;
 }

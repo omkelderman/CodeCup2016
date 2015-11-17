@@ -20,23 +20,36 @@ GameRhythmState& operator++(GameRhythmState& gameRhythmState);
 
 GameRhythmState operator++(GameRhythmState& gameRhythmState, int);
 
+class GameState {
+public:
+    GameState();
+    // implicit copy constructor and assignment operator should do
+
+    GameState& operator++();
+    GameState operator++(int);
+
+    unsigned short getMoveCounter() const;
+    GameRhythmState getGameRhythmState() const;
+private:
+    unsigned short moveCounter;
+    GameRhythmState gameRhythmState;
+};
+
 class Game6561 {
 public:
-    Game6561(std::istream& istream, std::ostream& ostream, std::ostream& logStream, Algorithm& algorithm);
+    static const int MAX_MOVES = 1000;
 
+    Game6561(std::istream& istream, std::ostream& ostream, std::ostream& logStream, Algorithm& algorithm);
     void run();
 private:
-    static const int MAX_MOVES = 1000;
     std::istream& istream;
     std::ostream& ostream;
     std::ostream& logStream;
     Board board;
     Algorithm& algorithm;
-    GameRhythmState gameRhythmState;
+    GameState gameState;
 
     std::string nextLine;
-
-    unsigned short moveCounter;
 
     /**
      * Reads one line from input and stores it into global var 'nextLine'
