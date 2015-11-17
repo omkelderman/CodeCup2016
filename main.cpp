@@ -1,5 +1,3 @@
-#include "Board.h"
-
 #include <iostream>
 #include <stdexcept>
 #include "Game6561.h"

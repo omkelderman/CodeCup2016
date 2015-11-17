@@ -49,6 +49,7 @@ private:
      */
     void parseNextLine();
 
+    void readPiece(PieceColor color);
     void readSlide();
 
     const Coords readCoords();

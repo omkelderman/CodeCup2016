@@ -2,7 +2,7 @@
 #include "GameException.h"
 
 GameRhythmState& operator++(GameRhythmState& gameRhythmState) {
-    switch(gameRhythmState) {
+    switch (gameRhythmState) {
         case GR_BLUE:
             gameRhythmState = GR_RED;
             break;
@@ -29,19 +29,20 @@ GameRhythmState operator++(GameRhythmState& gameRhythmState, int) {
 }
 
 Game6561::Game6561(std::istream& istream, std::ostream& ostream, std::ostream& logStream, Algorithm& algorithm) :
-        istream(istream), ostream(ostream), logStream(logStream), algorithm(algorithm), gameRhythmState(GR_BLUE), moveCounter(0) {
+        istream(istream), ostream(ostream), logStream(logStream), algorithm(algorithm), gameRhythmState(GR_BLUE),
+        moveCounter(0) {
     algorithm.setBoard(&board);
 }
 
 void Game6561::run() {
     readNextLine();
-    if(nextLine[0] == 'A') {
+    if (nextLine[0] == 'A') {
         doMove();
 #ifdef DO_DEBUG_LOG
         printBoard();
 #endif
     }
-    while(readNextLine()) {
+    while (readNextLine()) {
         parseNextLine();
 #ifdef DO_DEBUG_LOG
         printBoard();
@@ -59,28 +60,27 @@ bool Game6561::readNextLine() {
 }
 
 void Game6561::parseNextLine() {
-    switch(gameRhythmState++){
-        case GR_BLUE: {
-            const Coords& coords = readCoords();
-            board.setPiece(coords.row, coords.column, BLUE);
+    switch (gameRhythmState++) {
+        case GR_BLUE:
+            readPiece(BLUE);
             break;
-        }
-        case GR_RED: {
-            const Coords& coords = readCoords();
-            board.setPiece(coords.row, coords.column, RED);
+        case GR_RED:
+            readPiece(RED);
             break;
-        }
-        case GR_GREY: {
-            const Coords& coords = readCoords();
-            board.setPiece(coords.row, coords.column, GREY);
+        case GR_GREY:
+            readPiece(GREY);
             break;
-        }
         case GR_SLIDE1:
         case GR_SLIDE2:
             readSlide();
             break;
     }
     ++moveCounter;
+}
+
+void Game6561::readPiece(PieceColor color) {
+    const Coords& coords = readCoords();
+    board.setPiece(coords.row, coords.column, color);
 }
 
 void Game6561::readSlide() {
@@ -97,7 +97,8 @@ void Game6561::readSlide() {
         case 'R':
             board.slideRight();
             break;
-        default:break;
+        default:
+            break;
     }
 }
 
@@ -108,7 +109,7 @@ const Coords Game6561::readCoords() {
 }
 
 void Game6561::doMove() {
-    if(moveCounter >= MAX_MOVES) {
+    if (moveCounter >= MAX_MOVES) {
         logStream << "Max moves reached: " << std::endl;
         return;
     }
