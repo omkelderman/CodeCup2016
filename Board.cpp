@@ -6,6 +6,10 @@
 Coords::Coords(coord row, coord column): row(row), column(column) {
 }
 
+bool Coords::operator==(const Coords& coords) {
+    return row == coords.row && column == coords.column;
+}
+
 std::ostream& operator<<(std::ostream& ostream, const Coords& coords) {
     ostream << '[' << ((int) coords.row) << ',' << ((int) coords.column) << ']';
     return ostream;

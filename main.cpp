@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include "Game6561.h"
 #include "TestAlgorithm.h"
+#include "MonteCarloAlgorithm.h"
 
 int main() {
     try {

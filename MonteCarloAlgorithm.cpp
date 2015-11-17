@@ -19,3 +19,13 @@ const Coords MonteCarloAlgorithm::calculateGreyMove() const {
 SlideDirection MonteCarloAlgorithm::calculateSlide() const {
     throw std::logic_error("Not implemented");
 }
+
+void MonteCarloAlgorithm::simulate(std::size_t movesToCalculate) {
+    for (std::size_t i = 0; i < movesToCalculate; ) {
+        i += simulateGame();
+    }
+}
+
+size_t MonteCarloAlgorithm::simulateGame() {
+    return 0;
+}

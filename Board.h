@@ -10,6 +10,8 @@ struct Coords {
     coord column;
 
     Coords(coord row, coord column);
+
+    bool operator==(const Coords& coords);
 };
 
 enum SlideDirection {
