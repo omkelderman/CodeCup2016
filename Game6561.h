@@ -37,7 +37,7 @@ private:
 
 class Game6561 {
 public:
-    static const int MAX_MOVES = 1000;
+    static const std::size_t MAX_MOVES = 1000;
 
     Game6561(std::istream& istream, std::ostream& ostream, std::ostream& logStream, Algorithm& algorithm);
     void run();

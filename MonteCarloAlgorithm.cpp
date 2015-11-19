@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <algorithm>
 #include "MonteCarloAlgorithm.h"
 
 MonteCarloAlgorithm::MonteCarloAlgorithm() :
@@ -25,9 +26,8 @@ SlideDirection MonteCarloAlgorithm::calculateSlide() const {
 }
 
 void MonteCarloAlgorithm::simulate(std::size_t movesToCalculate) {
-    std::size_t movesDone = 0;
-    while (movesDone < movesToCalculate) {
-        movesDone += simulateGame();
+    while (movesToCalculate > 0) {
+        movesToCalculate -= simulateGame(movesToCalculate);
     }
 }
 
@@ -42,14 +42,17 @@ Coords MonteCarloAlgorithm::generatorRandomCoords() {
     return Coords(static_cast<coord>(rnd & 0x3), static_cast<coord>(rnd >> 2));
 }
 
-size_t MonteCarloAlgorithm::simulateGame() {
+std::size_t MonteCarloAlgorithm::simulateGame(std::size_t maxMovesInSimulation) {
+    // A copy for the local board is needed, as it'll be used as a reference in the random functions below.
+    // now we only use the local(Board/GameState) variables after this, as we don't want to change the 6561Game board.
     Board localBoard(*board);
     GameState localGameState(*gameState);
-    // now only use the local vars after this!!!
 
     Simulation simulation;
     bool simulationValid = true;
-    while (simulationValid && localGameState.getMoveCounter() < Game6561::MAX_MOVES) {
+    std::size_t gameMaxMoves = Game6561::MAX_MOVES;
+    std::size_t maxMoves = std::min(maxMovesInSimulation, gameMaxMoves);
+    while (simulationValid && localGameState.getMoveCounter() < maxMoves) {
         switch (localGameState.getGameRhythmState()) {
             case GR_BLUE:
                 simulationValid = addRandomCoordsToSimulation(simulation, localBoard, BLUE);

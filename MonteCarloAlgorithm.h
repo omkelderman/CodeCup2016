@@ -38,13 +38,13 @@ private:
     // returns true if a valid move was possible, false otherwise
     bool addRandomSlideToSimulation(Simulation& simulation, Board& board);
 
-    // add a random peace placement to the given simulation, and update the given board accordingly
+    // add a random piece placement to the given simulation, and update the given board accordingly
     // returns true if a valid move was possible, false otherwise
     bool addRandomCoordsToSimulation(Simulation& simulation, Board& board, PieceColor color);
 
     // simulations
     std::forward_list<Simulation> simulations;
-    size_t simulateGame();
+    std::size_t simulateGame(std::size_t maxMovesInSimulation);
 };
 
 #endif //CODECUP_MONTECARLOALGORITHM_H
