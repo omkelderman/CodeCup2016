@@ -1,11 +1,11 @@
 #ifndef CODECUP_SIMULATION_H
 #define CODECUP_SIMULATION_H
 
-
 #include "Board.h"
 #include "Move.h"
 
 class Simulation {
+    friend class MonteCarloAlgorithm;
 public:
     Simulation();
 

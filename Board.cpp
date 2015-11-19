@@ -162,3 +162,13 @@ void Board::slideRight() {
         }
     }
 }
+
+std::uint32_t Board::getBoardScore() const {
+    std::uint32_t score = 0;
+    for(coord row = 0; row < 3; ++row){
+        for(coord column = 0; column < 3; ++column){
+            score += pieces[row][column].value;
+        }
+    }
+    return score;
+}

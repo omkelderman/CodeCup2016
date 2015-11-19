@@ -36,6 +36,8 @@ public:
     void slideLeft();
     void slideRight();
     const Piece& getPiece(coord row, coord column) const;
+
+    std::uint32_t getBoardScore() const;
 private:
     /**
      * pieces[rows][columns]

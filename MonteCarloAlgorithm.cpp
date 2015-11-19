@@ -69,6 +69,7 @@ std::size_t MonteCarloAlgorithm::simulateGame(std::size_t maxMovesInSimulation) 
                 break;
         }
 
+        simulation.maxScore = std::max(simulation.maxScore, localBoard.getBoardScore());
         ++localGameState;
     }
 
