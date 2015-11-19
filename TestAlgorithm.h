@@ -13,10 +13,6 @@ public:
     virtual const Coords calculateGreyMove() const;
     virtual SlideDirection calculateSlide() const;
     const Coords getFirstEmpty() const;
-    bool slideUpIsValid() const;
-    bool slideDownIsValid() const;
-    bool slideLeftIsValid() const;
-    bool slideRightIsValid() const;
 };
 
 
