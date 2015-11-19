@@ -37,6 +37,8 @@ public:
     void slideRight();
     const Piece& getPiece(coord row, coord column) const;
 
+    bool isSlideValid(const SlideDirection& slideDirection) const;
+
     std::uint32_t getBoardScore() const;
 private:
     /**
@@ -51,6 +53,11 @@ private:
     static void slidePieces(Piece* pieces[]);
     static void removeWhitespace(Piece* pieces[]);
     static void removeDuplicates(Piece* pieces[]);
+
+    bool isSlideUpValid() const;
+    bool isSlideDownValid() const;
+    bool isSlideLeftValid() const;
+    bool isSlideRightValid() const;
 };
 
 

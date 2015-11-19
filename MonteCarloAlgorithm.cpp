@@ -3,7 +3,7 @@
 #include "MonteCarloAlgorithm.h"
 
 MonteCarloAlgorithm::MonteCarloAlgorithm() :
-        Algorithm(), randomSlideDistribution(0, 3), randomCoordsDistribution(0, 15) {
+        Algorithm() {
     // seed the random generator with a (hopefully) non-deterministic random number
     std::random_device rd;
     randomGenerator.seed(rd());
@@ -29,17 +29,6 @@ void MonteCarloAlgorithm::simulate(std::size_t movesToCalculate) {
     while (movesToCalculate > 0) {
         movesToCalculate -= simulateGame(movesToCalculate);
     }
-}
-
-SlideDirection MonteCarloAlgorithm::generatorRandomSlide() {
-    return static_cast<SlideDirection>(randomSlideDistribution(randomGenerator));
-}
-
-Coords MonteCarloAlgorithm::generatorRandomCoords() {
-    // generate random number between 0 and 15
-    unsigned short rnd = randomCoordsDistribution(randomGenerator);
-    // take two bits of the number as row, the other two bits as column
-    return Coords(static_cast<coord>(rnd & 0x3), static_cast<coord>(rnd >> 2));
 }
 
 std::size_t MonteCarloAlgorithm::simulateGame(std::size_t maxMovesInSimulation) {
@@ -73,18 +62,70 @@ std::size_t MonteCarloAlgorithm::simulateGame(std::size_t maxMovesInSimulation) 
         ++localGameState;
     }
 
-    if(simulation.getMovesCount() > 0) {
+    if (simulation.getMovesCount() > 0) {
         simulations.push_front(simulation);
     }
     return simulation.getMovesCount();
 }
 
+unsigned short MonteCarloAlgorithm::generateRandomNumber(unsigned short max,
+                                                         unsigned short exclusionList[] /*= nullptr*/,
+                                                         unsigned short exclusionListLength /*= 0*/) {
+    unsigned short localMax = max - exclusionListLength;
+    std::uniform_int_distribution<unsigned short> dis(0, localMax);
+    unsigned short rnd = dis(randomGenerator);
+    for(unsigned short i = 0; i < exclusionListLength; ++i) {
+        if(rnd >= exclusionList[i]) {
+            rnd++;
+        }
+    }
+    return rnd;
+}
+
 bool MonteCarloAlgorithm::addRandomSlideToSimulation(Simulation& simulation, Board& board) {
-    // TODO try random slides till valid
+    unsigned short invalidSlides[4];
+    unsigned short invalidSlidesLength = 0;
+    while (invalidSlidesLength < 4){
+        unsigned short slideNr = generateRandomNumber(3, invalidSlides, invalidSlidesLength);
+        SlideDirection slideDirection = static_cast<SlideDirection>(slideNr);
+        if(board.isSlideValid(slideDirection)) {
+            board.slide(slideDirection);
+            simulation.addMove(slideDirection);
+            return true;
+        }
+        invalidSlides[invalidSlidesLength] = slideNr;
+        ++invalidSlidesLength;
+    }
     return false;
 }
 
 bool MonteCarloAlgorithm::addRandomCoordsToSimulation(Simulation& simulation, Board& board, PieceColor color) {
-    // TODO try random placements till valid
-    return false;
+    unsigned short nonEmptyCoords[16];
+    unsigned short nonEmptyCoordsLength = getNonEmptyCoords(nonEmptyCoords, board);
+
+    if(nonEmptyCoordsLength == 16) {
+        return false;
+    }
+    int rnd = generateRandomNumber(15, nonEmptyCoords, nonEmptyCoordsLength);
+    Coords coords(static_cast<coord>(rnd & 0x3), static_cast<coord>(rnd >> 2));
+    simulation.addMove(coords);
+    board.setPiece(coords.row, coords.column, color);
+    return true;
+}
+
+unsigned short MonteCarloAlgorithm::getNonEmptyCoords(unsigned short nonEmptyCoords[], const Board& board) {
+    unsigned short nonEmptyCoordsLength = 0;
+    for (coord row = 0; row < 3; ++row) {
+        for (coord column = 0; column < 3; ++column) {
+            if(!board.getPiece(row, column).empty()) {
+                nonEmptyCoords[nonEmptyCoordsLength] = coordsToUShort(row, column);
+                ++nonEmptyCoordsLength;
+            }
+        }
+    }
+    return nonEmptyCoordsLength;
+}
+
+unsigned short MonteCarloAlgorithm::coordsToUShort(coord row, coord column) {
+    return row + (column << 2);
 }

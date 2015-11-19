@@ -24,15 +24,12 @@ private:
     // random generator
     std::mt19937 randomGenerator;
 
-    // randomDistributions
-    std::uniform_int_distribution<unsigned short> randomSlideDistribution;
-    std::uniform_int_distribution<unsigned short> randomCoordsDistribution;
+    // simulations
+    std::forward_list<Simulation> simulations;
+    std::size_t simulateGame(std::size_t maxMovesInSimulation);
 
-    // generate a completely random slide
-    SlideDirection generatorRandomSlide();
-
-    // generate completely random coords
-    Coords generatorRandomCoords();
+    unsigned short generateRandomNumber(unsigned short max, unsigned short exclusionList[] = nullptr,
+                                        unsigned short exclusionListLength = 0);
 
     // add a random slide to the given simulation, and update the given board accordingly
     // returns true if a valid move was possible, false otherwise
@@ -42,9 +39,8 @@ private:
     // returns true if a valid move was possible, false otherwise
     bool addRandomCoordsToSimulation(Simulation& simulation, Board& board, PieceColor color);
 
-    // simulations
-    std::forward_list<Simulation> simulations;
-    std::size_t simulateGame(std::size_t maxMovesInSimulation);
+    unsigned short getNonEmptyCoords(unsigned short nonEmptyCoords[], const Board& board);
+    unsigned short coordsToUShort(coord row, coord column);
 };
 
 #endif //CODECUP_MONTECARLOALGORITHM_H

@@ -3,7 +3,8 @@
 #include <stdexcept>
 #include <iostream>
 
-Coords::Coords(coord row, coord column): row(row), column(column) {
+Coords::Coords(coord row, coord column) :
+        row(row), column(column) {
 }
 
 bool Coords::operator==(const Coords& coords) {
@@ -130,6 +131,20 @@ void Board::slideRight() {
     }
 }
 
+bool Board::isSlideValid(const SlideDirection& slideDirection) const {
+    switch (slideDirection) {
+        case UP:
+            return isSlideUpValid();
+        case DOWN:
+            return isSlideDownValid();
+        case LEFT:
+            return isSlideLeftValid();
+        case RIGHT:
+            return isSlideRightValid();
+    }
+    return false;
+}
+
 /* static */ void Board::slidePieces(Piece* pieces[]) {
     removeWhitespace(pieces);
     removeDuplicates(pieces);
@@ -165,10 +180,118 @@ void Board::slideRight() {
 
 std::uint32_t Board::getBoardScore() const {
     std::uint32_t score = 0;
-    for(coord row = 0; row < 3; ++row){
-        for(coord column = 0; column < 3; ++column){
+    for (coord row = 0; row < 3; ++row) {
+        for (coord column = 0; column < 3; ++column) {
             score += pieces[row][column].value;
         }
     }
     return score;
+}
+
+bool Board::isSlideUpValid() const {
+    for (coord column = 0; column < 4; ++column) {
+        bool hasEmpty = false;
+        for (coord row = 0; row < 4; ++row) {
+            if (hasEmpty) {
+                if (!getPiece(row, column).empty()) {
+                    return true;
+                }
+            } else {
+                if (getPiece(row, column).empty()) {
+                    hasEmpty = true;
+                }
+            }
+        }
+
+        unsigned short lastValue = 0;
+        for (coord row = 0; row < 4; ++row) {
+            const Piece& p = getPiece(row, column);
+            if (!p.empty() && p.value == lastValue) {
+                return true;
+            }
+            lastValue = p.value;
+        }
+    }
+    return false;
+}
+
+bool Board::isSlideDownValid() const {
+    for (coord column = 0; column < 4; ++column) {
+        bool hasEmpty = false;
+        for (coord row = 4; row-- > 0; ) {
+            if (hasEmpty) {
+                if (!getPiece(row, column).empty()) {
+                    return true;
+                }
+            } else {
+                if (getPiece(row, column).empty()) {
+                    hasEmpty = true;
+                }
+            }
+        }
+
+        unsigned short lastValue = 0;
+        for (coord row = 4; row-- > 0; ) {
+            const Piece& p = getPiece(row, column);
+            if (!p.empty() && p.value == lastValue) {
+                return true;
+            }
+            lastValue = p.value;
+        }
+    }
+    return false;
+}
+
+bool Board::isSlideLeftValid() const {
+    for (coord row = 0; row < 4; ++row) {
+        bool hasEmpty = false;
+        for (coord column = 0; column < 4; ++column) {
+            if (hasEmpty) {
+                if (!getPiece(row, column).empty()) {
+                    return true;
+                }
+            } else {
+                if (getPiece(row, column).empty()) {
+                    hasEmpty = true;
+                }
+            }
+        }
+
+        unsigned short lastValue = 0;
+        for (coord column = 0; column < 4; ++column) {
+            const Piece& p = getPiece(row, column);
+            if (!p.empty() && p.value == lastValue) {
+                return true;
+            }
+            lastValue = p.value;
+        }
+    }
+    return false;
+}
+
+bool Board::isSlideRightValid() const {
+    for (coord row = 0; row < 4; ++row) {
+        bool hasEmpty = false;
+        for (coord column = 4; column-- > 0;) {
+            if (hasEmpty) {
+                if (!getPiece(row, column).empty()) {
+                    return true;
+                }
+            } else {
+                if (getPiece(row, column).empty()) {
+                    hasEmpty = true;
+                }
+            }
+        }
+
+        unsigned short lastValue = 0;
+        for (coord column = 4; column-- > 0; ) {
+            const Piece& p = getPiece(row, column);
+            if (!p.empty() && p.value == lastValue) {
+                return true;
+            }
+            lastValue = p.value;
+        }
+    }
+    return false;
 }
