@@ -3,6 +3,8 @@
 
 #include "Board.h"
 
+class GameState;
+
 class Algorithm {
 
 public:
@@ -14,9 +16,11 @@ public:
     virtual SlideDirection calculateSlide() const = 0;
 
     void setBoard(Board* boardPtr);
+    void setGameState(GameState* gameStatePtr);
 
 protected:
     Board* board;
+    GameState* gameState;
 };
 
 

@@ -17,7 +17,7 @@ public:
     virtual const Coords calculateGreyMove() const;
     virtual SlideDirection calculateSlide() const;
 
-    void simulate(std::size_t movesToCalculate, const GameState& gameState);
+    void simulate(std::size_t movesToCalculate);
 
     //monte carlo stuff
 private:
@@ -44,7 +44,7 @@ private:
 
     // simulations
     std::forward_list<Simulation> simulations;
-    size_t simulateGame(const GameState& gameState);
+    size_t simulateGame();
 };
 
 #endif //CODECUP_MONTECARLOALGORITHM_H

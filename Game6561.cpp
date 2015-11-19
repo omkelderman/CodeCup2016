@@ -47,6 +47,7 @@ GameState GameState::operator++(int) {
 Game6561::Game6561(std::istream& istream, std::ostream& ostream, std::ostream& logStream, Algorithm& algorithm) :
         istream(istream), ostream(ostream), logStream(logStream), algorithm(algorithm) {
     algorithm.setBoard(&board);
+    algorithm.setGameState(&gameState);
 }
 
 void Game6561::run() {

@@ -24,10 +24,10 @@ SlideDirection MonteCarloAlgorithm::calculateSlide() const {
     throw std::logic_error("Not implemented");
 }
 
-void MonteCarloAlgorithm::simulate(std::size_t movesToCalculate, const GameState& gameState) {
+void MonteCarloAlgorithm::simulate(std::size_t movesToCalculate) {
     std::size_t movesDone = 0;
     while (movesDone < movesToCalculate) {
-        movesDone += simulateGame(gameState);
+        movesDone += simulateGame();
     }
 }
 
@@ -42,9 +42,9 @@ Coords MonteCarloAlgorithm::generatorRandomCoords() {
     return Coords(static_cast<coord>(rnd & 0x3), static_cast<coord>(rnd >> 2));
 }
 
-size_t MonteCarloAlgorithm::simulateGame(const GameState& gameState) {
+size_t MonteCarloAlgorithm::simulateGame() {
     Board localBoard(*board);
-    GameState localGameState(gameState);
+    GameState localGameState(*gameState);
     // now only use the local vars after this!!!
 
     Simulation simulation;
