@@ -44,3 +44,7 @@ const Coords TestAlgorithm::getFirstEmpty() const {
     }
     throw GameException("No first empty found");
 }
+
+void TestAlgorithm::ensureValidState() {
+    // nothing
+}

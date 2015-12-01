@@ -54,17 +54,17 @@ void Game6561::run() {
     readNextLine();
     if (nextLine[0] == 'A') {
         doMove();
-#ifdef DO_DEBUG_LOG
+#ifdef DEBUG_BUILD
         printBoard();
 #endif
     }
     while (readNextLine()) {
         parseNextLine();
-#ifdef DO_DEBUG_LOG
+#ifdef DEBUG_BUILD
         printBoard();
 #endif
         doMove();
-#ifdef DO_DEBUG_LOG
+#ifdef DEBUG_BUILD
         printBoard();
 #endif
     }
@@ -97,21 +97,26 @@ void Game6561::parseNextLine() {
 void Game6561::readPiece(PieceColor color) {
     const Coords& coords = readCoords();
     board.setPiece(coords.row, coords.column, color);
+    gameState.setLastReadMove(coords);
 }
 
 void Game6561::readSlide() {
     switch (nextLine[0]) {
         case 'U':
             board.slideUp();
+            gameState.setLastReadMove(UP);
             break;
         case 'D':
             board.slideDown();
+            gameState.setLastReadMove(DOWN);
             break;
         case 'L':
             board.slideLeft();
+            gameState.setLastReadMove(LEFT);
             break;
         case 'R':
             board.slideRight();
+            gameState.setLastReadMove(RIGHT);
             break;
         default:
             break;
@@ -131,6 +136,7 @@ void Game6561::doMove() {
     }
 
     try {
+        algorithm.ensureValidState();
         switch (gameState.getGameRhythmState()) {
             case GR_BLUE: {
                 const Coords& coords = algorithm.calculateBlueMove();
@@ -154,7 +160,7 @@ void Game6561::doMove() {
             case GR_SLIDE2:
                 SlideDirection slideDirection = algorithm.calculateSlide();
                 board.slide(slideDirection);
-                ostream << slideDirection << std::endl;
+                writeSlide(slideDirection);
                 break;
         }
     } catch (const GameException& e) {
@@ -165,6 +171,12 @@ void Game6561::doMove() {
 
 void Game6561::writeCoords(const Coords& coords) {
     ostream << coords.row + 1 << coords.column + 1 << std::endl;
+    gameState.setLastDoneMove(coords);
+}
+
+void Game6561::writeSlide(const SlideDirection& slideDirection) {
+    ostream << slideDirection << std::endl;
+    gameState.setLastDoneMove(slideDirection);
 }
 
 void Game6561::printBoard() {
@@ -177,4 +189,36 @@ unsigned short GameState::getMoveCounter() const {
 
 GameRhythmState GameState::getGameRhythmState() const {
     return gameRhythmState;
+}
+
+void GameState::setLastDoneMove(const Coords& coords) {
+    lastDoneMove.coords = coords;
+}
+
+void GameState::setLastDoneMove(const SlideDirection& slideDirection) {
+    lastDoneMove.direction = slideDirection;
+}
+
+Coords GameState::getLastDoneMoveAsCoords() const {
+    return lastDoneMove.coords;
+}
+
+SlideDirection GameState::getLastDoneMoveAsSlideDirection() const {
+    return lastDoneMove.direction;
+}
+
+void GameState::setLastReadMove(const Coords& coords) {
+    lastReadMove.coords = coords;
+}
+
+void GameState::setLastReadMove(const SlideDirection& slideDirection) {
+    lastReadMove.direction = slideDirection;
+}
+
+Coords GameState::getLastReadMoveAsCoords() const {
+    return lastReadMove.coords;
+}
+
+SlideDirection GameState::getLastReadMoveAsSlideDirection() const {
+    return lastReadMove.direction;
 }

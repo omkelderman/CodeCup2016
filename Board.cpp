@@ -60,6 +60,15 @@ std::istream& operator>>(std::istream& istream, SlideDirection& direction) {
 Board::Board() {
 }
 
+Board::Board(const Board& board) {
+    // copy them pieaces
+    std::copy(&board.pieces[0][0], &board.pieces[0][0]+4*4,&pieces[0][0]);
+
+//    std::cerr << __PRETTY_FUNCTION__ << std::endl;
+//    std::cerr << board << std::endl;
+//    std::cerr << *this << std::endl;
+}
+
 Board& Board::setPiece(coord row, coord column, PieceColor color, unsigned short value /*= 1*/) {
     if (!pieces[row][column].empty()) {
         throw std::invalid_argument("Piece already exists on this spot");

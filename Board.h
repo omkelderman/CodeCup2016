@@ -25,6 +25,9 @@ std::istream& operator>>(std::istream& istream, SlideDirection& direction);
 class Board {
 public:
     Board();
+    Board(const Board& board);
+
+    Board& operator=(const Board& board) = delete;
 
     Board& setPiece(coord row, coord column, PieceColor color, unsigned short value = 1);
 

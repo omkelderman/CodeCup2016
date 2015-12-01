@@ -5,6 +5,7 @@
 #include <ostream>
 #include "Board.h"
 #include "Algorithm.h"
+#include "Move.h"
 #include <utility>
 #include <string>
 
@@ -30,9 +31,24 @@ public:
 
     unsigned short getMoveCounter() const;
     GameRhythmState getGameRhythmState() const;
+
+    void setLastDoneMove(const Coords& coords);
+    void setLastDoneMove(const SlideDirection& slideDirection);
+
+    Coords getLastDoneMoveAsCoords() const;
+    SlideDirection getLastDoneMoveAsSlideDirection() const;
+
+    void setLastReadMove(const Coords& coords);
+    void setLastReadMove(const SlideDirection& slideDirection);
+
+    Coords getLastReadMoveAsCoords() const;
+    SlideDirection getLastReadMoveAsSlideDirection() const;
 private:
     unsigned short moveCounter;
     GameRhythmState gameRhythmState;
+
+    Move lastDoneMove;
+    Move lastReadMove;
 };
 
 class Game6561 {
@@ -72,6 +88,7 @@ private:
      */
     void doMove();
     void writeCoords(const Coords& coords);
+    void writeSlide(const SlideDirection& slideDirection);
 
 
     // debug functions

@@ -15,6 +15,8 @@ public:
     virtual const Coords calculateGreyMove() const = 0;
     virtual SlideDirection calculateSlide() const = 0;
 
+    virtual void ensureValidState() = 0;
+
     void setBoard(Board* boardPtr);
     void setGameState(GameState* gameStatePtr);
 

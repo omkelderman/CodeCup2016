@@ -2,33 +2,93 @@
 #include <algorithm>
 #include "MonteCarloAlgorithm.h"
 
+// constants
+const int MonteCarloAlgorithm::SIMULATIONS_THRESHOLD = 10;
+const std::size_t MonteCarloAlgorithm::MOVES_TO_SIMULATE = 100000;
+
 MonteCarloAlgorithm::MonteCarloAlgorithm() :
-        Algorithm() {
+        Algorithm(), bestSimulation(nullptr) {
     // seed the random generator with a (hopefully) non-deterministic random number
+#ifdef DEBUG_BUILD
+    randomGenerator.seed(69);
+#else
     std::random_device rd;
     randomGenerator.seed(rd());
+#endif
 }
 
 const Coords MonteCarloAlgorithm::calculateRedMove() const {
-    throw std::logic_error("Not implemented");
+    return bestSimulation->getFirstMoveAsCoords();
 }
 
 const Coords MonteCarloAlgorithm::calculateBlueMove() const {
-    throw std::logic_error("Not implemented");
+    return bestSimulation->getFirstMoveAsCoords();
 }
 
 const Coords MonteCarloAlgorithm::calculateGreyMove() const {
-    throw std::logic_error("Not implemented");
+    return bestSimulation->getFirstMoveAsCoords();
 }
 
 SlideDirection MonteCarloAlgorithm::calculateSlide() const {
-    throw std::logic_error("Not implemented");
+    return bestSimulation->getFirstMoveAsSlideDirection();
+}
+
+void MonteCarloAlgorithm::ensureValidState() {
+    if (gameState->getMoveCounter() >= 2) {
+        // remove simulation where the first two moves do not equal the last done moves
+        simulations.remove_if([this](const Simulation& simulation) {
+            if (simulation.getMovesCount() <= 2) {
+                return true;
+            }
+            switch (gameState->getGameRhythmState()) {
+                case GR_BLUE:
+                    return !simulation.checkFirstTwoMoves(gameState->getLastDoneMoveAsSlideDirection(),
+                                                          gameState->getLastReadMoveAsSlideDirection());
+                case GR_RED:
+                    return !simulation.checkFirstTwoMoves(gameState->getLastDoneMoveAsSlideDirection(),
+                                                          gameState->getLastReadMoveAsCoords());
+                case GR_GREY:
+                case GR_SLIDE1:
+                    return !simulation.checkFirstTwoMoves(gameState->getLastDoneMoveAsCoords(),
+                                                          gameState->getLastReadMoveAsCoords());
+                case GR_SLIDE2:
+                    return !simulation.checkFirstTwoMoves(gameState->getLastDoneMoveAsCoords(),
+                                                          gameState->getLastReadMoveAsSlideDirection());
+                default:
+                    return false;
+            }
+        });
+
+        // remove the first two moves of the remaining simulations since those two have just been executed
+        for (Simulation& simulation : simulations) {
+            simulation.removeFirstTwo();
+        }
+
+        // we updated simulations, bestSimulation should update as well
+        updateBestSimulation();
+    }
+    if (shouldSimulateMore()) {
+        simulate(MOVES_TO_SIMULATE);
+    }
+}
+
+void MonteCarloAlgorithm::updateBestSimulation() {
+    if(distance(simulations.begin(), simulations.end()) == 0) {
+            bestSimulation = nullptr;
+        } else {
+        bestSimulation = &(*max_element(simulations.begin(), simulations.end()));
+    }
+}
+
+bool MonteCarloAlgorithm::shouldSimulateMore() const {
+    return distance(simulations.begin(), simulations.end()) < SIMULATIONS_THRESHOLD;
 }
 
 void MonteCarloAlgorithm::simulate(std::size_t movesToCalculate) {
     while (movesToCalculate > 0) {
         movesToCalculate -= simulateGame(movesToCalculate);
     }
+    updateBestSimulation();
 }
 
 std::size_t MonteCarloAlgorithm::simulateGame(std::size_t maxMovesInSimulation) {
@@ -40,8 +100,8 @@ std::size_t MonteCarloAlgorithm::simulateGame(std::size_t maxMovesInSimulation) 
     Simulation simulation;
     bool simulationValid = true;
     std::size_t gameMaxMoves = Game6561::MAX_MOVES;
-    std::size_t maxMoves = std::min(maxMovesInSimulation, gameMaxMoves);
-    while (simulationValid && localGameState.getMoveCounter() < maxMoves) {
+    std::size_t maxMoveCounter = std::min(maxMovesInSimulation + localGameState.getMoveCounter(), gameMaxMoves);
+    while (simulationValid && localGameState.getMoveCounter() < maxMoveCounter) {
         switch (localGameState.getGameRhythmState()) {
             case GR_BLUE:
                 simulationValid = addRandomCoordsToSimulation(simulation, localBoard, BLUE);
@@ -74,8 +134,8 @@ unsigned short MonteCarloAlgorithm::generateRandomNumber(unsigned short max,
     unsigned short localMax = max - exclusionListLength;
     std::uniform_int_distribution<unsigned short> dis(0, localMax);
     unsigned short rnd = dis(randomGenerator);
-    for(unsigned short i = 0; i < exclusionListLength; ++i) {
-        if(rnd >= exclusionList[i]) {
+    for (unsigned short i = 0; i < exclusionListLength; ++i) {
+        if (rnd >= exclusionList[i]) {
             rnd++;
         }
     }
@@ -85,16 +145,17 @@ unsigned short MonteCarloAlgorithm::generateRandomNumber(unsigned short max,
 bool MonteCarloAlgorithm::addRandomSlideToSimulation(Simulation& simulation, Board& board) {
     unsigned short invalidSlides[4];
     unsigned short invalidSlidesLength = 0;
-    while (invalidSlidesLength < 4){
+    while (invalidSlidesLength < 4) {
         unsigned short slideNr = generateRandomNumber(3, invalidSlides, invalidSlidesLength);
         SlideDirection slideDirection = static_cast<SlideDirection>(slideNr);
-        if(board.isSlideValid(slideDirection)) {
+        if (board.isSlideValid(slideDirection)) {
             board.slide(slideDirection);
             simulation.addMove(slideDirection);
             return true;
         }
         invalidSlides[invalidSlidesLength] = slideNr;
         ++invalidSlidesLength;
+        std::sort(invalidSlides, invalidSlides + invalidSlidesLength);
     }
     return false;
 }
@@ -103,7 +164,7 @@ bool MonteCarloAlgorithm::addRandomCoordsToSimulation(Simulation& simulation, Bo
     unsigned short nonEmptyCoords[16];
     unsigned short nonEmptyCoordsLength = getNonEmptyCoords(nonEmptyCoords, board);
 
-    if(nonEmptyCoordsLength == 16) {
+    if (nonEmptyCoordsLength == 16) {
         return false;
     }
     int rnd = generateRandomNumber(15, nonEmptyCoords, nonEmptyCoordsLength);
@@ -115,9 +176,9 @@ bool MonteCarloAlgorithm::addRandomCoordsToSimulation(Simulation& simulation, Bo
 
 unsigned short MonteCarloAlgorithm::getNonEmptyCoords(unsigned short nonEmptyCoords[], const Board& board) {
     unsigned short nonEmptyCoordsLength = 0;
-    for (coord row = 0; row < 3; ++row) {
-        for (coord column = 0; column < 3; ++column) {
-            if(!board.getPiece(row, column).empty()) {
+    for (coord column = 0; column < 4; ++column) {
+        for (coord row = 0; row < 4; ++row) {
+            if (!board.getPiece(row, column).empty()) {
                 nonEmptyCoords[nonEmptyCoordsLength] = coordsToUShort(row, column);
                 ++nonEmptyCoordsLength;
             }
