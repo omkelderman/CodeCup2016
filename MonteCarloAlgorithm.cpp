@@ -34,26 +34,26 @@ SlideDirection MonteCarloAlgorithm::calculateSlide() const {
 }
 
 void MonteCarloAlgorithm::ensureValidState() {
-    if (gameState->getMoveCounter() >= 2) {
+    if (*gameMoveCounterPtr >= 2) {
         // remove simulation where the first two moves do not equal the last done moves
         simulations.remove_if([this](const Simulation& simulation) {
             if (simulation.getMovesCount() <= 2) {
                 return true;
             }
-            switch (gameState->getGameRhythmState()) {
+            switch (gameBoardPtr->getGameRhythmState()) {
                 case GR_BLUE:
-                    return !simulation.checkFirstTwoMoves(gameState->getLastDoneMoveAsSlideDirection(),
-                                                          gameState->getLastReadMoveAsSlideDirection());
+                    return !simulation.checkFirstTwoMoves(gameBoardPtr->getSecondLastMoveAsSlideDirection(),
+                                                          gameBoardPtr->getLastMoveAsSlideDirection());
                 case GR_RED:
-                    return !simulation.checkFirstTwoMoves(gameState->getLastDoneMoveAsSlideDirection(),
-                                                          gameState->getLastReadMoveAsCoords());
+                    return !simulation.checkFirstTwoMoves(gameBoardPtr->getSecondLastMoveAsSlideDirection(),
+                                                          gameBoardPtr->getLastMoveAsCoords());
                 case GR_GREY:
                 case GR_SLIDE1:
-                    return !simulation.checkFirstTwoMoves(gameState->getLastDoneMoveAsCoords(),
-                                                          gameState->getLastReadMoveAsCoords());
+                    return !simulation.checkFirstTwoMoves(gameBoardPtr->getSecondLastMoveAsCoords(),
+                                                          gameBoardPtr->getLastMoveAsCoords());
                 case GR_SLIDE2:
-                    return !simulation.checkFirstTwoMoves(gameState->getLastDoneMoveAsCoords(),
-                                                          gameState->getLastReadMoveAsSlideDirection());
+                    return !simulation.checkFirstTwoMoves(gameBoardPtr->getSecondLastMoveAsCoords(),
+                                                          gameBoardPtr->getLastMoveAsSlideDirection());
                 default:
                     return false;
             }
@@ -94,15 +94,15 @@ void MonteCarloAlgorithm::simulate(std::size_t movesToCalculate) {
 std::size_t MonteCarloAlgorithm::simulateGame(std::size_t maxMovesInSimulation) {
     // A copy for the local board is needed, as it'll be used as a reference in the random functions below.
     // now we only use the local(Board/GameState) variables after this, as we don't want to change the 6561Game board.
-    Board localBoard(*board);
-    GameState localGameState(*gameState);
+    Board localBoard = *gameBoardPtr;
+    unsigned short localMoveCounter = *gameMoveCounterPtr;
 
     Simulation simulation;
     bool simulationValid = true;
     std::size_t gameMaxMoves = Game6561::MAX_MOVES;
-    std::size_t maxMoveCounter = std::min(maxMovesInSimulation + localGameState.getMoveCounter(), gameMaxMoves);
-    while (simulationValid && localGameState.getMoveCounter() < maxMoveCounter) {
-        switch (localGameState.getGameRhythmState()) {
+    std::size_t maxMoveCounter = std::min(maxMovesInSimulation + localMoveCounter, gameMaxMoves);
+    while (simulationValid && (localMoveCounter < maxMoveCounter)) {
+        switch (localBoard.getGameRhythmState()) {
             case GR_BLUE:
                 simulationValid = addRandomCoordsToSimulation(simulation, localBoard, BLUE);
                 break;
@@ -119,7 +119,7 @@ std::size_t MonteCarloAlgorithm::simulateGame(std::size_t maxMovesInSimulation) 
         }
 
         simulation.maxScore = std::max(simulation.maxScore, localBoard.getBoardScore());
-        ++localGameState;
+        ++localMoveCounter;
     }
 
     if (simulation.getMovesCount() > 0) {
@@ -170,7 +170,7 @@ bool MonteCarloAlgorithm::addRandomCoordsToSimulation(Simulation& simulation, Bo
     int rnd = generateRandomNumber(15, nonEmptyCoords, nonEmptyCoordsLength);
     Coords coords(static_cast<coord>(rnd & 0x3), static_cast<coord>(rnd >> 2));
     simulation.addMove(coords);
-    board.setPiece(coords.row, coords.column, color);
+    board.setPiece(coords, color);
     return true;
 }
 

@@ -2,44 +2,35 @@
 #define CODECUP_BOARD_H
 
 #include "Piece.h"
-
-typedef unsigned char coord;
-
-struct Coords {
-    coord row;
-    coord column;
-
-    Coords(coord row, coord column);
-
-    bool operator==(const Coords& coords);
-};
-
-enum SlideDirection {
-    UP, DOWN, LEFT, RIGHT
-};
-
-std::ostream& operator<<(std::ostream& ostream, const Coords& coords);
-std::ostream& operator<<(std::ostream& ostream, const SlideDirection& direction);
-std::istream& operator>>(std::istream& istream, SlideDirection& direction);
+#include "Move.h"
+#include "GameRhythmState.h"
 
 class Board {
 public:
     Board();
-    Board(const Board& board);
+    Board(const Board& otherBoard);
 
-    Board& operator=(const Board& board) = delete;
+    Board& operator=(const Board& otherBoard) = delete;
 
-    Board& setPiece(coord row, coord column, PieceColor color, unsigned short value = 1);
+    GameRhythmState getGameRhythmState() const;
+
+    Coords getLastMoveAsCoords() const;
+    SlideDirection getLastMoveAsSlideDirection() const;
+
+    Coords getSecondLastMoveAsCoords() const;
+    SlideDirection getSecondLastMoveAsSlideDirection() const;
 
     friend std::ostream& operator<<(std::ostream& ostream, const Board& board);
 
+    // do move methods
+    Board& setPiece(const Coords& coords, PieceColor color, unsigned short value = 1);
     void slide(SlideDirection direction);
     void slideUp();
     void slideDown();
     void slideLeft();
     void slideRight();
-    const Piece& getPiece(coord row, coord column) const;
 
+    const Piece& getPiece(coord row, coord column) const;
     bool isSlideValid(const SlideDirection& slideDirection) const;
 
     std::uint32_t getBoardScore() const;
@@ -48,6 +39,10 @@ private:
      * pieces[rows][columns]
      */
     Piece pieces[4][4];
+
+    GameRhythmState gameRhythmState;
+
+    Move lastTwoMoves[2];
 
     /**
      * Array-size should be 4
@@ -61,6 +56,8 @@ private:
     bool isSlideDownValid() const;
     bool isSlideLeftValid() const;
     bool isSlideRightValid() const;
+
+    void addLastMove(const Move& move);
 };
 
 

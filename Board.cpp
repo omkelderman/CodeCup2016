@@ -1,98 +1,37 @@
 #include "Board.h"
 
 #include <stdexcept>
-#include <iostream>
 
-Coords::Coords(coord row, coord column) :
-        row(row), column(column) {
+Board::Board() :
+        gameRhythmState(GR_BLUE) {
 }
 
-bool Coords::operator==(const Coords& coords) {
-    return row == coords.row && column == coords.column;
-}
-
-std::ostream& operator<<(std::ostream& ostream, const Coords& coords) {
-    ostream << '[' << ((int) coords.row) << ',' << ((int) coords.column) << ']';
-    return ostream;
-}
-
-std::ostream& operator<<(std::ostream& ostream, const SlideDirection& direction) {
-    switch (direction) {
-        case UP:
-            ostream << 'U';
-            break;
-        case DOWN:
-            ostream << 'D';
-            break;
-        case LEFT:
-            ostream << 'L';
-            break;
-        case RIGHT:
-            ostream << 'R';
-            break;
-    }
-    return ostream;
-}
-
-std::istream& operator>>(std::istream& istream, SlideDirection& direction) {
-    char c;
-    istream >> c;
-    switch (c) {
-        case 'U':
-            direction = UP;
-            break;
-        case 'D':
-            direction = DOWN;
-            break;
-        case 'L':
-            direction = LEFT;
-            break;
-        case 'R':
-            direction = RIGHT;
-            break;
-        default:
-            // I don't f*cking know
-            break;
-    }
-    return istream;
-}
-
-Board::Board() {
-}
-
-Board::Board(const Board& board) {
+Board::Board(const Board& otherBoard) {
     // copy them pieaces
-    std::copy(&board.pieces[0][0], &board.pieces[0][0]+4*4,&pieces[0][0]);
-
-//    std::cerr << __PRETTY_FUNCTION__ << std::endl;
-//    std::cerr << board << std::endl;
-//    std::cerr << *this << std::endl;
+    std::copy(&otherBoard.pieces[0][0], &otherBoard.pieces[0][0] + 4 * 4, &pieces[0][0]);
+    gameRhythmState = otherBoard.gameRhythmState;
+    lastTwoMoves[0] = otherBoard.lastTwoMoves[0];
+    lastTwoMoves[1] = otherBoard.lastTwoMoves[1];
 }
 
-Board& Board::setPiece(coord row, coord column, PieceColor color, unsigned short value /*= 1*/) {
-    if (!pieces[row][column].empty()) {
-        throw std::invalid_argument("Piece already exists on this spot");
-    }
-    pieces[row][column].value = value;
-    pieces[row][column].color = color;
-    return *this;
+GameRhythmState Board::getGameRhythmState() const {
+    return gameRhythmState;
 }
 
-void Board::slide(SlideDirection direction) {
-    switch (direction) {
-        case UP:
-            slideUp();
-            break;
-        case DOWN:
-            slideDown();
-            break;
-        case LEFT:
-            slideLeft();
-            break;
-        case RIGHT:
-            slideRight();
-            break;
-    }
+Coords Board::getLastMoveAsCoords() const {
+    return lastTwoMoves[0].coords;
+}
+
+SlideDirection Board::getLastMoveAsSlideDirection() const {
+    return lastTwoMoves[0].direction;
+}
+
+Coords Board::getSecondLastMoveAsCoords() const {
+    return lastTwoMoves[1].coords;
+}
+
+SlideDirection Board::getSecondLastMoveAsSlideDirection() const {
+    return lastTwoMoves[1].direction;
 }
 
 std::ostream& operator<<(std::ostream& ostream, const Board& board) {
@@ -108,8 +47,32 @@ std::ostream& operator<<(std::ostream& ostream, const Board& board) {
     return ostream;
 }
 
-const Piece& Board::getPiece(coord row, coord column) const {
-    return pieces[row][column];
+Board& Board::setPiece(const Coords& coords, PieceColor color, unsigned short value /*= 1*/) {
+    if (!pieces[coords.row][coords.column].empty()) {
+        throw std::invalid_argument("Piece already exists on this spot");
+    }
+    pieces[coords.row][coords.column].value = value;
+    pieces[coords.row][coords.column].color = color;
+    ++gameRhythmState;
+    addLastMove(coords);
+    return *this;
+}
+
+void Board::slide(SlideDirection direction) {
+    switch (direction) {
+        case SD_UP:
+            slideUp();
+            break;
+        case SD_DOWN:
+            slideDown();
+            break;
+        case SD_LEFT:
+            slideLeft();
+            break;
+        case SD_RIGHT:
+            slideRight();
+            break;
+    }
 }
 
 void Board::slideUp() {
@@ -117,6 +80,8 @@ void Board::slideUp() {
         Piece* localPieces[] = {&(pieces[0][column]), &(pieces[1][column]), &(pieces[2][column]), &(pieces[3][column])};
         slidePieces(localPieces);
     }
+    ++gameRhythmState;
+    addLastMove(SD_UP);
 }
 
 void Board::slideDown() {
@@ -124,6 +89,8 @@ void Board::slideDown() {
         Piece* localPieces[] = {&(pieces[3][column]), &(pieces[2][column]), &(pieces[1][column]), &(pieces[0][column])};
         slidePieces(localPieces);
     }
+    ++gameRhythmState;
+    addLastMove(SD_DOWN);
 }
 
 void Board::slideLeft() {
@@ -131,6 +98,8 @@ void Board::slideLeft() {
         Piece* localPieces[] = {&pieces[row][0], &pieces[row][1], &pieces[row][2], &pieces[row][3]};
         slidePieces(localPieces);
     }
+    ++gameRhythmState;
+    addLastMove(SD_LEFT);
 }
 
 void Board::slideRight() {
@@ -138,17 +107,23 @@ void Board::slideRight() {
         Piece* localPieces[] = {&pieces[row][3], &pieces[row][2], &pieces[row][1], &pieces[row][0]};
         slidePieces(localPieces);
     }
+    ++gameRhythmState;
+    addLastMove(SD_RIGHT);
+}
+
+const Piece& Board::getPiece(coord row, coord column) const {
+    return pieces[row][column];
 }
 
 bool Board::isSlideValid(const SlideDirection& slideDirection) const {
     switch (slideDirection) {
-        case UP:
+        case SD_UP:
             return isSlideUpValid();
-        case DOWN:
+        case SD_DOWN:
             return isSlideDownValid();
-        case LEFT:
+        case SD_LEFT:
             return isSlideLeftValid();
-        case RIGHT:
+        case SD_RIGHT:
             return isSlideRightValid();
     }
     return false;
@@ -227,7 +202,7 @@ bool Board::isSlideUpValid() const {
 bool Board::isSlideDownValid() const {
     for (coord column = 0; column < 4; ++column) {
         bool hasEmpty = false;
-        for (coord row = 4; row-- > 0; ) {
+        for (coord row = 4; row-- > 0;) {
             if (hasEmpty) {
                 if (!getPiece(row, column).empty()) {
                     return true;
@@ -240,7 +215,7 @@ bool Board::isSlideDownValid() const {
         }
 
         unsigned short lastValue = 0;
-        for (coord row = 4; row-- > 0; ) {
+        for (coord row = 4; row-- > 0;) {
             const Piece& p = getPiece(row, column);
             if (!p.empty() && p.value == lastValue) {
                 return true;
@@ -294,7 +269,7 @@ bool Board::isSlideRightValid() const {
         }
 
         unsigned short lastValue = 0;
-        for (coord column = 4; column-- > 0; ) {
+        for (coord column = 4; column-- > 0;) {
             const Piece& p = getPiece(row, column);
             if (!p.empty() && p.value == lastValue) {
                 return true;
@@ -303,4 +278,9 @@ bool Board::isSlideRightValid() const {
         }
     }
     return false;
+}
+
+void Board::addLastMove(const Move& move) {
+    lastTwoMoves[1] = lastTwoMoves[0];
+    lastTwoMoves[0] = move;
 }

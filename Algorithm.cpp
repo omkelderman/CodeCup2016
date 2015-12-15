@@ -2,12 +2,12 @@
 #include "Game6561.h"
 
 Algorithm::Algorithm() :
-        board(nullptr), gameState(nullptr) { }
+        gameBoardPtr(nullptr), gameMoveCounterPtr(nullptr) { }
 
-void Algorithm::setBoard(Board* boardPtr) {
-    board = boardPtr;
+void Algorithm::setGameBoardPtr(Board* gameBoardPtr) {
+    Algorithm::gameBoardPtr = gameBoardPtr;
 }
 
-void Algorithm::setGameState(GameState* gameStatePtr) {
-    gameState = gameStatePtr;
+void Algorithm::setGameMoveCounterPtr(unsigned short* gameMoveCounterPtr) {
+    Algorithm::gameMoveCounterPtr = gameMoveCounterPtr;
 }

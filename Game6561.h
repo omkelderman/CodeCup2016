@@ -8,20 +8,9 @@
 #include "Move.h"
 #include <utility>
 #include <string>
+#include "GameRhythmState.h"
 
-/**
- * An enumeration to keep track of the Rhythm, applied in the 6561 game.
- * This "rhythm" decides what to do in the current turn.
- */
-enum GameRhythmState {
-    GR_BLUE, GR_RED, GR_GREY, GR_SLIDE1, GR_SLIDE2
-};
-
-GameRhythmState& operator++(GameRhythmState& gameRhythmState);
-
-GameRhythmState operator++(GameRhythmState& gameRhythmState, int);
-
-class GameState {
+/*class GameState {
 public:
     GameState();
     // implicit copy constructor and assignment operator should do
@@ -49,7 +38,7 @@ private:
 
     Move lastDoneMove;
     Move lastReadMove;
-};
+};*/
 
 class Game6561 {
 public:
@@ -63,7 +52,7 @@ private:
     std::ostream& logStream;
     Board board;
     Algorithm& algorithm;
-    GameState gameState;
+    unsigned short moveCounter;
 
     std::string nextLine;
 

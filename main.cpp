@@ -29,6 +29,6 @@ int main() {
 //    b.setPiece(3, 1, BLUE, 1);
 //    b.setPiece(3, 2, GREY, 1);
 //    b.setPiece(3, 3, RED, 1);
-//    std::cout << b.isSlideValid(DOWN) << std::endl;
+//    std::cout << b.isSlideValid(SD_DOWN) << std::endl;
 //
 //}

@@ -17,12 +17,12 @@ public:
 
     virtual void ensureValidState() = 0;
 
-    void setBoard(Board* boardPtr);
-    void setGameState(GameState* gameStatePtr);
+    void setGameBoardPtr(Board* gameBoardPtr);
+    void setGameMoveCounterPtr(unsigned short* gameMoveCounterPtr);
 
 protected:
-    Board* board;
-    GameState* gameState;
+    Board* gameBoardPtr;
+    unsigned short* gameMoveCounterPtr;
 };
 
 

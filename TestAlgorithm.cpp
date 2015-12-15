@@ -25,8 +25,8 @@ const Coords TestAlgorithm::calculateGreyMove() const {
 }
 
 SlideDirection TestAlgorithm::calculateSlide() const {
-    for(SlideDirection dir : {UP, DOWN, LEFT, RIGHT}) {
-        if(board->isSlideValid(dir)) {
+    for(SlideDirection dir : {SD_UP, SD_DOWN, SD_LEFT, SD_RIGHT}) {
+        if(gameBoardPtr->isSlideValid(dir)) {
             std::cerr << "Slide direction: " << dir << std::endl;
             return dir;
         }
@@ -37,7 +37,7 @@ SlideDirection TestAlgorithm::calculateSlide() const {
 const Coords TestAlgorithm::getFirstEmpty() const {
     for (coord row = 0; row < 4; ++row) {
         for (coord column = 0; column < 4; ++column) {
-            if (board->getPiece(row, column).empty()) {
+            if (gameBoardPtr->getPiece(row, column).empty()) {
                 return Coords(row, column);
             }
         }
