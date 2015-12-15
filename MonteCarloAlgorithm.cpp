@@ -73,9 +73,9 @@ void MonteCarloAlgorithm::ensureValidState() {
 }
 
 void MonteCarloAlgorithm::updateBestSimulation() {
-    if(distance(simulations.begin(), simulations.end()) == 0) {
-            bestSimulation = nullptr;
-        } else {
+    if (distance(simulations.begin(), simulations.end()) == 0) {
+        bestSimulation = nullptr;
+    } else {
         bestSimulation = &(*max_element(simulations.begin(), simulations.end()));
     }
 }
