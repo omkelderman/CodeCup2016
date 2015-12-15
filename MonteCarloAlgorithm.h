@@ -19,23 +19,23 @@ public:
 
     virtual void ensureValidState();
 
-    void simulate(std::size_t movesToCalculate);
-
     //monte carlo stuff
+
 private:
     // constants
     static const int SIMULATIONS_THRESHOLD;
     static const std::size_t MOVES_TO_SIMULATE;
-
     // random generator
     std::mt19937 randomGenerator;
 
     // simulations
     std::forward_list<Simulation> simulations;
-    Simulation* bestSimulation;
 
+    Simulation* bestSimulation;
     void updateBestSimulation();
+
     bool shouldSimulateMore() const;
+    void simulate(std::size_t movesToCalculate);
     std::size_t simulateGame(std::size_t maxMovesInSimulation);
 
     /**
