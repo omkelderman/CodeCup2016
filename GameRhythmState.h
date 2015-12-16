@@ -9,6 +9,8 @@ enum GameRhythmState {
     GR_BLUE, GR_RED, GR_GREY, GR_SLIDE1, GR_SLIDE2
 };
 
+bool gameRhythmStateIsSlide(const GameRhythmState& gameRhythmState);
+
 GameRhythmState& operator++(GameRhythmState& gameRhythmState);
 
 GameRhythmState operator++(GameRhythmState& gameRhythmState, int);

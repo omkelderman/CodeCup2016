@@ -14,6 +14,27 @@ Board::Board(const Board& otherBoard) {
     lastTwoMoves[1] = otherBoard.lastTwoMoves[1];
 }
 
+bool Board::operator<(const Board& otherBoard) const {
+    if (gameRhythmState == otherBoard.gameRhythmState) {
+        // compare with board
+        for (coord row = 0; row < 4; ++row) {
+            for (coord column = 0; column < 4; ++column) {
+                if (pieces[row][column].value == otherBoard.pieces[row][column].value) {
+                    if(pieces[row][column].value != 0 && pieces[row][column].color != otherBoard.pieces[row][column].color) {
+                        return pieces[row][column].color < otherBoard.pieces[row][column].color;
+                    }
+                } else {
+                    return pieces[row][column].value < otherBoard.pieces[row][column].value;
+                }
+            }
+        }
+        return false;
+    } else {
+        // gameRhythmState is not equal, compare with that
+        return gameRhythmState < otherBoard.gameRhythmState;
+    }
+}
+
 GameRhythmState Board::getGameRhythmState() const {
     return gameRhythmState;
 }
@@ -109,6 +130,24 @@ void Board::slideRight() {
     }
     ++gameRhythmState;
     addLastMove(SD_RIGHT);
+}
+
+void Board::doMove(const Move& move) {
+    switch (gameRhythmState) {
+        case GR_BLUE:
+            setPiece(move.coords, BLUE);
+            break;
+        case GR_RED:
+            setPiece(move.coords, RED);
+            break;
+        case GR_GREY:
+            setPiece(move.coords, GREY);
+            break;
+        case GR_SLIDE1:
+        case GR_SLIDE2:
+            slide(move.direction);
+            break;
+    }
 }
 
 const Piece& Board::getPiece(coord row, coord column) const {
@@ -278,6 +317,41 @@ bool Board::isSlideRightValid() const {
         }
     }
     return false;
+}
+
+std::size_t Board::getValidMoves(Move validMoves[16]) const {
+    std::size_t validMoveCounter = 0;
+    if (gameRhythmStateIsSlide(gameRhythmState)) {
+        // slide
+        if (isSlideUpValid()) {
+            validMoves[validMoveCounter].direction = SD_UP;
+            ++validMoveCounter;
+        }
+        if (isSlideDownValid()) {
+            validMoves[validMoveCounter].direction = SD_DOWN;
+            ++validMoveCounter;
+        }
+        if (isSlideLeftValid()) {
+            validMoves[validMoveCounter].direction = SD_LEFT;
+            ++validMoveCounter;
+        }
+        if (isSlideRightValid()) {
+            validMoves[validMoveCounter].direction = SD_RIGHT;
+            ++validMoveCounter;
+        }
+    } else {
+        // coords
+        for (coord column = 0; column < 4; ++column) {
+            for (coord row = 0; row < 4; ++row) {
+                if (!getPiece(row, column).empty()) {
+                    validMoves[validMoveCounter].coords.row = row;
+                    validMoves[validMoveCounter].coords.column = column;
+                    ++validMoveCounter;
+                }
+            }
+        }
+    }
+    return validMoveCounter;
 }
 
 void Board::addLastMove(const Move& move) {

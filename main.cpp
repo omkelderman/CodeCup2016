@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include "Game6561.h"
 #include "MonteCarloAlgorithm.h"
+#include "MonteCarloTreeSearchAlgorithm.h"
 
 //void test();
 
@@ -9,12 +10,12 @@ int main() {
 
 //    test();
     try {
-        MonteCarloAlgorithm algorithm;
+        MonteCarloTreeSearchAlgorithm algorithm(100000, 1.4);
         std::cerr << "START" << std::endl;
         Game6561 game(std::cin, std::cout, std::cerr, algorithm);
         game.run();
         std::cerr << "END" << std::endl;
-    } catch (const std::exception& e){
+    } catch (const std::exception& e) {
         std::cerr << "Halp, exception: " << e.what() << std::endl;
     }
 

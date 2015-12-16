@@ -11,6 +11,7 @@ public:
     Board(const Board& otherBoard);
 
     Board& operator=(const Board& otherBoard) = delete;
+    bool operator<(const Board& otherBoard) const;
 
     GameRhythmState getGameRhythmState() const;
 
@@ -29,9 +30,12 @@ public:
     void slideDown();
     void slideLeft();
     void slideRight();
+    void doMove(const Move& move);
 
     const Piece& getPiece(coord row, coord column) const;
     bool isSlideValid(const SlideDirection& slideDirection) const;
+
+    std::size_t getValidMoves(Move validMoves[16]) const;
 
     std::uint32_t getBoardScore() const;
 private:

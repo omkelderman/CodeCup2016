@@ -1,5 +1,9 @@
 #include "GameRhythmState.h"
 
+bool gameRhythmStateIsSlide(const GameRhythmState& gameRhythmState) {
+    return gameRhythmState == GR_SLIDE1 || gameRhythmState == GR_SLIDE2;
+}
+
 GameRhythmState& operator++(GameRhythmState& gameRhythmState) {
     switch (gameRhythmState) {
         case GR_BLUE:
