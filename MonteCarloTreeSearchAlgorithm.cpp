@@ -4,6 +4,13 @@
 
 MonteCarloTreeSearchAlgorithm::MonteCarloTreeSearchAlgorithm(std::size_t movesToSimulate, double ucb1Constant) :
         movesToSimulate(movesToSimulate), ucb1Constant(ucb1Constant) {
+    // seed the random generator with a (hopefully) non-deterministic random number
+#ifdef DEBUG_BUILD
+    randomGenerator.seed(69);
+#else
+    std::random_device rd;
+    randomGenerator.seed(rd());
+#endif
 }
 
 const Coords MonteCarloTreeSearchAlgorithm::calculateRedMove() const {
@@ -30,6 +37,11 @@ void MonteCarloTreeSearchAlgorithm::ensureValidState() {
         nextMove = validMoves[0];
         return;
     }
+#ifdef DEBUG_BUILD
+    if(validMoveCounter == 0) {
+        throw std::logic_error("No valid moves found, this shouldn't have happened....????");
+    }
+#endif
 
     runSimulations(movesToSimulate);
 
@@ -56,6 +68,7 @@ void MonteCarloTreeSearchAlgorithm::ensureValidState() {
 }
 
 void MonteCarloTreeSearchAlgorithm::runSimulations(std::size_t movesToSimulate) {
+    statistics.clear();
     while (movesToSimulate > 0) {
         movesToSimulate -= simulateGame(movesToSimulate);
     }
@@ -65,12 +78,13 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
     std::forward_list<Board> visitedBoardStates;
 
     Board localBoard = *gameBoardPtr;
+    std::uint32_t maxScoreOfSimulation = 0;
     Move validMoves[16];
     std::size_t simulatedMovesCount = 0;
     bool expensionPhaseHasHappend = false;
     while (simulatedMovesCount < movesToSimulate) {
-        std::size_t validCounter = localBoard.getValidMoves(validMoves);
-        if (validCounter == 0) {
+        std::size_t validMovesCount = localBoard.getValidMoves(validMoves);
+        if (validMovesCount == 0) {
             // no more moves, them game is done
             break;
         }
@@ -80,22 +94,23 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
                                      localBoard, localBoard, localBoard, localBoard, localBoard, localBoard, localBoard,
                                      localBoard, localBoard};
         bool statsKnown = true;
-        for (std::size_t validMoveIndex = 0; validMoveIndex < validCounter; ++validMoveIndex) {
+        for (std::size_t validMoveIndex = 0; validMoveIndex < validMovesCount; ++validMoveIndex) {
             validNextBoards[validMoveIndex].doMove(validMoves[validMoveIndex]);
             if (statistics.find(validNextBoards[validMoveIndex]) == statistics.end()) {
                 statsKnown = false;
+                break;
             }
         }
         std::size_t theChosenMoveIndex = 0;
         if (statsKnown) {
             // selection with UCB1-stuff
             std::uint32_t playCountSum = 0;
-            for (std::size_t validIndex = 0; validIndex < validCounter; ++validIndex) {
+            for (std::size_t validIndex = 0; validIndex < validMovesCount; ++validIndex) {
                 playCountSum += statistics[validNextBoards[validIndex]].playCount;
             }
             double logOfPlayCountSum = std::log(playCountSum);
             double maxUcb1Value = 0;
-            for (std::size_t validIndex = 0; validIndex < validCounter; ++validIndex) {
+            for (std::size_t validIndex = 0; validIndex < validMovesCount; ++validIndex) {
                 Statistic& stat = statistics[validNextBoards[validIndex]];
                 double ucb1Value = stat.score + ucb1Constant * std::sqrt(logOfPlayCountSum / stat.playCount);
                 if (ucb1Value > maxUcb1Value) {
@@ -105,11 +120,13 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
             }
         } else {
             // selection with random, or simulation with random, depending on where we are in the algorithm
-            theChosenMoveIndex = generateRandomNumber(validCounter);
+            theChosenMoveIndex = generateRandomNumber(validMovesCount - 1);
         }
 
         // update localBoard with the chosen move
         localBoard.doMove(validMoves[theChosenMoveIndex]);
+        // update max score
+        maxScoreOfSimulation = std::max(maxScoreOfSimulation, localBoard.getBoardScore());
 
         if (!expensionPhaseHasHappend && statistics.find(localBoard) == statistics.end()) {
             expensionPhaseHasHappend = true;
@@ -127,7 +144,15 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
         if (it != statistics.end()) {
             Statistic& stat = it->second;
             ++stat.playCount;
-            stat.score = std::max(stat.score, prevScore);
+
+            if(prevScore == 0) {
+                // first board in visitied list that exists in the statistics, so it has to be the just expanded board
+                // this means this board should have the value of the just done simulation
+                stat.score = maxScoreOfSimulation;
+            } else {
+                // otherwise do fancy shizz
+                stat.score = std::max(stat.score, prevScore);
+            }
             prevScore = stat.score;
         }
     }

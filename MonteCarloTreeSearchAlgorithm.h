@@ -30,6 +30,10 @@ private:
 
     // random gen stuff
     std::mt19937 randomGenerator;
+
+    /**
+     * Generate random number in range [0, max]
+     */
     std::size_t generateRandomNumber(std::size_t max);
 
     Move nextMove;

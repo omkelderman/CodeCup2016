@@ -343,7 +343,7 @@ std::size_t Board::getValidMoves(Move validMoves[16]) const {
         // coords
         for (coord column = 0; column < 4; ++column) {
             for (coord row = 0; row < 4; ++row) {
-                if (!getPiece(row, column).empty()) {
+                if (getPiece(row, column).empty()) {
                     validMoves[validMoveCounter].coords.row = row;
                     validMoves[validMoveCounter].coords.column = column;
                     ++validMoveCounter;
