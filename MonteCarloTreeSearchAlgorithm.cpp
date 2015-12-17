@@ -1,6 +1,9 @@
 #include <stdexcept>
 #include "MonteCarloTreeSearchAlgorithm.h"
 #include <forward_list>
+#ifdef _WIN32
+#include <ctime>
+#endif
 
 MonteCarloTreeSearchAlgorithm::MonteCarloTreeSearchAlgorithm(std::size_t movesToSimulate, double ucb1Constant) :
         movesToSimulate(movesToSimulate), ucb1Constant(ucb1Constant) {
@@ -8,8 +11,12 @@ MonteCarloTreeSearchAlgorithm::MonteCarloTreeSearchAlgorithm(std::size_t movesTo
 #ifdef DEBUG_BUILD
     randomGenerator.seed(69);
 #else
+#ifdef _WIN32
+    randomGenerator.seed((unsigned)time(nullptr));
+#else
     std::random_device rd;
     randomGenerator.seed(rd());
+#endif
 #endif
 }
 
