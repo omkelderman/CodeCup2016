@@ -145,22 +145,27 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
         ++simulatedMovesCount;
     }
 
-    std::uint32_t prevScore = 0;
+    std::uint32_t initScore = 0;
     for (const Board& visitedBoard : visitedBoardStates) {
         auto it = statistics.find(visitedBoard);
         if (it != statistics.end()) {
             Statistic& stat = it->second;
             ++stat.playCount;
 
-            if(prevScore == 0) {
+            if(initScore == 0) {
                 // first board in visitied list that exists in the statistics, so it has to be the just expanded board
                 // this means this board should have the value of the just done simulation
                 stat.score = maxScoreOfSimulation;
+                initScore = stat.score;
             } else {
                 // otherwise do fancy shizz
-                stat.score = std::max(stat.score, prevScore);
+#if BP_STRATEGY==1
+                stat.score = std::max(stat.score, initScore);
+#endif
+#if BP_STRATEGY==2
+                stat.score += initScore;
+#endif
             }
-            prevScore = stat.score;
         }
     }
 
