@@ -14,7 +14,7 @@ typedef std::map<Board, Statistic> Statistics;
 
 class MonteCarloTreeSearchAlgorithm : public Algorithm {
 public:
-    MonteCarloTreeSearchAlgorithm(std::size_t movesToSimulate, double ucb1Constant);
+    MonteCarloTreeSearchAlgorithm(std::size_t movesToSimulate, double ucb1Constant, MonteCarloPolicy& policy);
 
     virtual const Coords calculateRedMove() const;
     virtual const Coords calculateBlueMove() const;
@@ -27,7 +27,7 @@ private:
     const std::size_t movesToSimulate;
     const double ucb1Constant;
 
-    RandomMonteCarloPolicy randomMonteCarloPolicy;
+    MonteCarloPolicy& policy;
 
     Move nextMove;
     Statistics statistics;
