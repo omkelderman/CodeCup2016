@@ -1,6 +1,9 @@
 #include <stdexcept>
 #include <algorithm>
 #include "MonteCarloAlgorithm.h"
+#ifdef _WIN32
+#include <ctime>
+#endif
 
 // constants
 const int MonteCarloAlgorithm::SIMULATIONS_THRESHOLD = 10;
@@ -12,8 +15,12 @@ MonteCarloAlgorithm::MonteCarloAlgorithm() :
 #ifdef DEBUG_BUILD
     randomGenerator.seed(69);
 #else
+    #ifdef _WIN32
+    randomGenerator.seed((unsigned)time(nullptr));
+#else
     std::random_device rd;
     randomGenerator.seed(rd());
+#endif
 #endif
 }
 
