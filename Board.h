@@ -15,12 +15,6 @@ public:
 
     GameRhythmState getGameRhythmState() const;
 
-    Coords getLastMoveAsCoords() const;
-    SlideDirection getLastMoveAsSlideDirection() const;
-
-    Coords getSecondLastMoveAsCoords() const;
-    SlideDirection getSecondLastMoveAsSlideDirection() const;
-
     friend std::ostream& operator<<(std::ostream& ostream, const Board& board);
 
     // do move methods
@@ -46,8 +40,6 @@ private:
 
     GameRhythmState gameRhythmState;
 
-    Move lastTwoMoves[2];
-
     /**
      * Array-size should be 4
      * Slides towards p0
@@ -60,8 +52,6 @@ private:
     bool isSlideDownValid() const;
     bool isSlideLeftValid() const;
     bool isSlideRightValid() const;
-
-    void addLastMove(const Move& move);
 };
 
 

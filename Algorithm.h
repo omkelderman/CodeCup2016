@@ -2,6 +2,7 @@
 #define CODECUP_ALGORITHM_H
 
 #include "Board.h"
+#include "GameProgress.h"
 
 class GameState;
 
@@ -18,11 +19,11 @@ public:
     virtual void ensureValidState() = 0;
 
     void setGameBoardPtr(Board* gameBoardPtr);
-    void setGameMoveCounterPtr(unsigned short* gameMoveCounterPtr);
+    void setGameGameProgressPtr(GameProgress* gameGameProgressPtr);
 
 protected:
     Board* gameBoardPtr;
-    unsigned short* gameMoveCounterPtr;
+    GameProgress* gameGameProgressPtr;
 };
 
 

@@ -34,7 +34,7 @@ SlideDirection MonteCarloAlgorithm::calculateSlide() const {
 }
 
 void MonteCarloAlgorithm::ensureValidState() {
-    if (*gameMoveCounterPtr >= 2) {
+    if (gameGameProgressPtr->getMoveCounter() >= 2) {
         // remove simulation where the first two moves do not equal the last done moves
         simulations.remove_if([this](const Simulation& simulation) {
             if (simulation.getMovesCount() <= 2) {
@@ -42,18 +42,18 @@ void MonteCarloAlgorithm::ensureValidState() {
             }
             switch (gameBoardPtr->getGameRhythmState()) {
                 case GR_BLUE:
-                    return !simulation.checkFirstTwoMoves(gameBoardPtr->getSecondLastMoveAsSlideDirection(),
-                                                          gameBoardPtr->getLastMoveAsSlideDirection());
+                    return !simulation.checkFirstTwoMoves(gameGameProgressPtr->getLastDoneMoveAsSlideDirection(),
+                                                          gameGameProgressPtr->getLastReadMoveAsSlideDirection());
                 case GR_RED:
-                    return !simulation.checkFirstTwoMoves(gameBoardPtr->getSecondLastMoveAsSlideDirection(),
-                                                          gameBoardPtr->getLastMoveAsCoords());
+                    return !simulation.checkFirstTwoMoves(gameGameProgressPtr->getLastDoneMoveAsSlideDirection(),
+                                                          gameGameProgressPtr->getLastReadMoveAsCoords());
                 case GR_GREY:
                 case GR_SLIDE1:
-                    return !simulation.checkFirstTwoMoves(gameBoardPtr->getSecondLastMoveAsCoords(),
-                                                          gameBoardPtr->getLastMoveAsCoords());
+                    return !simulation.checkFirstTwoMoves(gameGameProgressPtr->getLastDoneMoveAsCoords(),
+                                                          gameGameProgressPtr->getLastReadMoveAsCoords());
                 case GR_SLIDE2:
-                    return !simulation.checkFirstTwoMoves(gameBoardPtr->getSecondLastMoveAsCoords(),
-                                                          gameBoardPtr->getLastMoveAsSlideDirection());
+                    return !simulation.checkFirstTwoMoves(gameGameProgressPtr->getLastDoneMoveAsCoords(),
+                                                          gameGameProgressPtr->getLastReadMoveAsSlideDirection());
                 default:
                     return false;
             }
@@ -95,7 +95,7 @@ std::size_t MonteCarloAlgorithm::simulateGame(std::size_t maxMovesInSimulation) 
     // A copy for the local board is needed, as it'll be used as a reference in the random functions below.
     // now we only use the local(Board/GameState) variables after this, as we don't want to change the 6561Game board.
     Board localBoard = *gameBoardPtr;
-    unsigned short localMoveCounter = *gameMoveCounterPtr;
+    unsigned short localMoveCounter = gameGameProgressPtr->getMoveCounter();
 
     Simulation simulation;
     bool simulationValid = true;

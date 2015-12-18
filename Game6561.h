@@ -9,36 +9,7 @@
 #include <utility>
 #include <string>
 #include "GameRhythmState.h"
-
-/*class GameState {
-public:
-    GameState();
-    // implicit copy constructor and assignment operator should do
-
-    GameState& operator++();
-    GameState operator++(int);
-
-    unsigned short getMoveCounter() const;
-    GameRhythmState getGameRhythmState() const;
-
-    void setLastDoneMove(const Coords& coords);
-    void setLastDoneMove(const SlideDirection& slideDirection);
-
-    Coords getLastDoneMoveAsCoords() const;
-    SlideDirection getLastDoneMoveAsSlideDirection() const;
-
-    void setLastReadMove(const Coords& coords);
-    void setLastReadMove(const SlideDirection& slideDirection);
-
-    Coords getLastReadMoveAsCoords() const;
-    SlideDirection getLastReadMoveAsSlideDirection() const;
-private:
-    unsigned short moveCounter;
-    GameRhythmState gameRhythmState;
-
-    Move lastDoneMove;
-    Move lastReadMove;
-};*/
+#include "GameProgress.h"
 
 class Game6561 {
 public:
@@ -52,7 +23,7 @@ private:
     std::ostream& logStream;
     Board board;
     Algorithm& algorithm;
-    unsigned short moveCounter;
+    GameProgress gameProgress;
 
     std::string nextLine;
 

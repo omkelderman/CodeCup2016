@@ -10,8 +10,6 @@ Board::Board(const Board& otherBoard) {
     // copy them pieaces
     std::copy(&otherBoard.pieces[0][0], &otherBoard.pieces[0][0] + 4 * 4, &pieces[0][0]);
     gameRhythmState = otherBoard.gameRhythmState;
-    lastTwoMoves[0] = otherBoard.lastTwoMoves[0];
-    lastTwoMoves[1] = otherBoard.lastTwoMoves[1];
 }
 
 bool Board::operator<(const Board& otherBoard) const {
@@ -39,22 +37,6 @@ GameRhythmState Board::getGameRhythmState() const {
     return gameRhythmState;
 }
 
-Coords Board::getLastMoveAsCoords() const {
-    return lastTwoMoves[0].coords;
-}
-
-SlideDirection Board::getLastMoveAsSlideDirection() const {
-    return lastTwoMoves[0].direction;
-}
-
-Coords Board::getSecondLastMoveAsCoords() const {
-    return lastTwoMoves[1].coords;
-}
-
-SlideDirection Board::getSecondLastMoveAsSlideDirection() const {
-    return lastTwoMoves[1].direction;
-}
-
 std::ostream& operator<<(std::ostream& ostream, const Board& board) {
     ostream << "{|" << std::endl;
     for (int row = 0; row < 4; ++row) {
@@ -75,7 +57,6 @@ Board& Board::setPiece(const Coords& coords, PieceColor color, unsigned short va
     pieces[coords.row][coords.column].value = value;
     pieces[coords.row][coords.column].color = color;
     ++gameRhythmState;
-    addLastMove(coords);
     return *this;
 }
 
@@ -102,7 +83,6 @@ void Board::slideUp() {
         slidePieces(localPieces);
     }
     ++gameRhythmState;
-    addLastMove(SD_UP);
 }
 
 void Board::slideDown() {
@@ -111,7 +91,6 @@ void Board::slideDown() {
         slidePieces(localPieces);
     }
     ++gameRhythmState;
-    addLastMove(SD_DOWN);
 }
 
 void Board::slideLeft() {
@@ -120,7 +99,6 @@ void Board::slideLeft() {
         slidePieces(localPieces);
     }
     ++gameRhythmState;
-    addLastMove(SD_LEFT);
 }
 
 void Board::slideRight() {
@@ -129,7 +107,6 @@ void Board::slideRight() {
         slidePieces(localPieces);
     }
     ++gameRhythmState;
-    addLastMove(SD_RIGHT);
 }
 
 void Board::doMove(const Move& move) {
@@ -352,9 +329,4 @@ std::size_t Board::getValidMoves(Move validMoves[16]) const {
         }
     }
     return validMoveCounter;
-}
-
-void Board::addLastMove(const Move& move) {
-    lastTwoMoves[1] = lastTwoMoves[0];
-    lastTwoMoves[0] = move;
 }
