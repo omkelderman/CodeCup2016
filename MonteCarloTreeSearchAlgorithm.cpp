@@ -1,23 +1,9 @@
 #include <stdexcept>
 #include "MonteCarloTreeSearchAlgorithm.h"
 #include <forward_list>
-#ifdef _WIN32
-#include <ctime>
-#endif
 
 MonteCarloTreeSearchAlgorithm::MonteCarloTreeSearchAlgorithm(std::size_t movesToSimulate, double ucb1Constant) :
         movesToSimulate(movesToSimulate), ucb1Constant(ucb1Constant) {
-    // seed the random generator with a (hopefully) non-deterministic random number
-#ifdef DEBUG_BUILD
-    randomGenerator.seed(69);
-#else
-#ifdef _WIN32
-    randomGenerator.seed((unsigned)time(nullptr));
-#else
-    std::random_device rd;
-    randomGenerator.seed(rd());
-#endif
-#endif
 }
 
 const Coords MonteCarloTreeSearchAlgorithm::calculateRedMove() const {
@@ -127,7 +113,7 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
             }
         } else {
             // selection with random, or simulation with random, depending on where we are in the algorithm
-            theChosenMoveIndex = generateRandomNumber(validMovesCount - 1);
+            theChosenMoveIndex = randomMonteCarloPolicy.generateRandomNumber(validMovesCount - 1);
         }
 
         // update localBoard with the chosen move
@@ -170,9 +156,4 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
     }
 
     return simulatedMovesCount;
-}
-
-std::size_t MonteCarloTreeSearchAlgorithm::generateRandomNumber(std::size_t max) {
-    std::uniform_int_distribution<std::size_t> dis(0, max);
-    return dis(randomGenerator);
 }

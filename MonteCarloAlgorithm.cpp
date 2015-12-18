@@ -1,9 +1,6 @@
 #include <stdexcept>
 #include <algorithm>
 #include "MonteCarloAlgorithm.h"
-#ifdef _WIN32
-#include <ctime>
-#endif
 
 // constants
 const int MonteCarloAlgorithm::SIMULATIONS_THRESHOLD = 10;
@@ -11,17 +8,6 @@ const std::size_t MonteCarloAlgorithm::MOVES_TO_SIMULATE = 100000;
 
 MonteCarloAlgorithm::MonteCarloAlgorithm() :
         Algorithm(), bestSimulation(nullptr) {
-    // seed the random generator with a (hopefully) non-deterministic random number
-#ifdef DEBUG_BUILD
-    randomGenerator.seed(69);
-#else
-    #ifdef _WIN32
-    randomGenerator.seed((unsigned)time(nullptr));
-#else
-    std::random_device rd;
-    randomGenerator.seed(rd());
-#endif
-#endif
 }
 
 const Coords MonteCarloAlgorithm::calculateRedMove() const {
@@ -138,9 +124,7 @@ std::size_t MonteCarloAlgorithm::simulateGame(std::size_t maxMovesInSimulation) 
 unsigned short MonteCarloAlgorithm::generateRandomNumber(unsigned short max,
                                                          unsigned short exclusionList[] /*= nullptr*/,
                                                          unsigned short exclusionListLength /*= 0*/) {
-    unsigned short localMax = max - exclusionListLength;
-    std::uniform_int_distribution<unsigned short> dis(0, localMax);
-    unsigned short rnd = dis(randomGenerator);
+    unsigned short rnd = randomMonteCarloPolicy.generateRandomNumber(max - exclusionListLength);
     for (unsigned short i = 0; i < exclusionListLength; ++i) {
         if (rnd >= exclusionList[i]) {
             rnd++;

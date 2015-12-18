@@ -2,9 +2,8 @@
 #define CODECUP_MONTECARLOTREESEARCHALGORITHM_H
 
 #include "Algorithm.h"
+#include "MonteCarloPolicies.h"
 #include <map>
-#include <math.h>
-#include <random>
 
 struct Statistic {
     std::uint32_t score;
@@ -28,13 +27,7 @@ private:
     const std::size_t movesToSimulate;
     const double ucb1Constant;
 
-    // random gen stuff
-    std::mt19937 randomGenerator;
-
-    /**
-     * Generate random number in range [0, max]
-     */
-    std::size_t generateRandomNumber(std::size_t max);
+    RandomMonteCarloPolicy randomMonteCarloPolicy;
 
     Move nextMove;
     Statistics statistics;

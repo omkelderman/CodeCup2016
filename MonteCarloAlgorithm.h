@@ -7,6 +7,7 @@
 #include "Move.h"
 #include "Simulation.h"
 #include "Game6561.h"
+#include "MonteCarloPolicies.h"
 
 class MonteCarloAlgorithm : public Algorithm {
 public:
@@ -26,7 +27,7 @@ private:
     static const int SIMULATIONS_THRESHOLD;
     static const std::size_t MOVES_TO_SIMULATE;
     // random generator
-    std::mt19937 randomGenerator;
+    RandomMonteCarloPolicy randomMonteCarloPolicy;
 
     // simulations
     std::forward_list<Simulation> simulations;
