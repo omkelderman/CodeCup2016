@@ -404,8 +404,8 @@ std::size_t Board::findAdjecentPiecesWithSameColor(const Coords& coords, PieceCo
                                                    AdjacentPieceInfo* adjacentPieces) const {
     std::size_t adjacentPiecesCount = 0;
     // check left
-    if (coords.column > 1) {
-        const Coords& leftCoords = coords - Coords(0, 1);
+    if (coords.column > 0) {
+        const Coords leftCoords = coords - Coords(0, 1);
         const Piece& leftPiece = getPiece(leftCoords);
         if (!leftPiece.empty() && leftPiece.color == color) {
             adjacentPieces[adjacentPiecesCount].adjacentPieceCoords = leftCoords;
@@ -417,7 +417,7 @@ std::size_t Board::findAdjecentPiecesWithSameColor(const Coords& coords, PieceCo
     }
     // check right
     if (coords.column < 3) {
-        const Coords& rightCoords = coords + Coords(0, 1);
+        const Coords rightCoords = coords + Coords(0, 1);
         const Piece& rightPiece = getPiece(rightCoords);
         if (!rightPiece.empty() && rightPiece.color == color) {
             adjacentPieces[adjacentPiecesCount].adjacentPieceCoords = rightCoords;
@@ -428,8 +428,8 @@ std::size_t Board::findAdjecentPiecesWithSameColor(const Coords& coords, PieceCo
         }
     }
     // check up
-    if (coords.row > 1) {
-        const Coords& upCoords = coords - Coords(1, 0);
+    if (coords.row > 0) {
+        const Coords upCoords = coords - Coords(1, 0);
         const Piece& upPiece = getPiece(upCoords);
         if (!upPiece.empty() && upPiece.color == color) {
             adjacentPieces[adjacentPiecesCount].adjacentPieceCoords = upCoords;
@@ -441,7 +441,7 @@ std::size_t Board::findAdjecentPiecesWithSameColor(const Coords& coords, PieceCo
     }
     // check down
     if (coords.row < 3) {
-        const Coords& downCoords = coords + Coords(1, 0);
+        const Coords downCoords = coords + Coords(1, 0);
         const Piece& downPiece = getPiece(downCoords);
         if (!downPiece.empty() && downPiece.color == color) {
             adjacentPieces[adjacentPiecesCount].adjacentPieceCoords = downCoords;
@@ -457,7 +457,7 @@ std::size_t Board::findAdjecentPiecesWithSameColor(const Coords& coords, PieceCo
 size_t Board::findEmptyAdjacentPieces(Coords adjacentEmptyPieces[3], const Coords& coords) const {
     std::size_t adjacentPiecesCount = 0;
     // check left
-    if (coords.column > 1) {
+    if (coords.column > 0) {
         const Coords& leftCoords = coords - Coords(0, 1);
         if (getPiece(leftCoords).empty()) {
             adjacentEmptyPieces[adjacentPiecesCount] = leftCoords;
@@ -473,7 +473,7 @@ size_t Board::findEmptyAdjacentPieces(Coords adjacentEmptyPieces[3], const Coord
         }
     }
     // check up
-    if (coords.row > 1) {
+    if (coords.row > 0) {
         const Coords& upCoords = coords - Coords(1, 0);
         if (getPiece(upCoords).empty()) {
             adjacentEmptyPieces[adjacentPiecesCount] = upCoords;

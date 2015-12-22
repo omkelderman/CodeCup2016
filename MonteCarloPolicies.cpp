@@ -117,13 +117,13 @@ std::size_t HeuristicMonteCarloPolicy::getNextCoordsMove(const Board& board, Mov
         // If piece with "otherJunkColor" has been found, try to place piece adjacent to it
         // TODO this is crap
         if (otherJunkColorPiece) {
-            if (otherJunkColorPieceCoords.column > 1 &&
+            if (otherJunkColorPieceCoords.column > 0 &&
                 board.isPieceEmpty(otherJunkColorPieceCoords - Coords(0, 1))) {
                 return getIndexOfMove(validMoves, validMovesCount, otherJunkColorPieceCoords - Coords(0, 1));
             } else if (otherJunkColorPieceCoords.column < 3 &&
                        board.isPieceEmpty(otherJunkColorPieceCoords + Coords(0, 1))) {
                 return getIndexOfMove(validMoves, validMovesCount, otherJunkColorPieceCoords + Coords(0, 1));
-            } else if (otherJunkColorPieceCoords.row > 1 &&
+            } else if (otherJunkColorPieceCoords.row > 0 &&
                        board.isPieceEmpty(otherJunkColorPieceCoords - Coords(1, 0))) {
                 return getIndexOfMove(validMoves, validMovesCount, otherJunkColorPieceCoords - Coords(1, 0));
             } else if (otherJunkColorPieceCoords.row < 3 &&

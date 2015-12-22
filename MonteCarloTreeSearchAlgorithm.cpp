@@ -1,10 +1,13 @@
 #include <stdexcept>
 #include "MonteCarloTreeSearchAlgorithm.h"
+#include "Game6561.h"
 #include <forward_list>
 
 MonteCarloTreeSearchAlgorithm::MonteCarloTreeSearchAlgorithm(std::size_t movesToSimulate, double ucb1Constant,
+                                                             std::size_t maxLocalMovesToSimulate,
                                                              MonteCarloPolicy& policy) :
-        movesToSimulate(movesToSimulate), ucb1Constant(ucb1Constant), policy(policy) {
+        movesToSimulate(movesToSimulate), ucb1Constant(ucb1Constant), maxLocalMovesToSimulate(maxLocalMovesToSimulate),
+        policy(policy) {
 }
 
 const Coords MonteCarloTreeSearchAlgorithm::calculateRedMove() const {
@@ -64,7 +67,9 @@ void MonteCarloTreeSearchAlgorithm::ensureValidState() {
 void MonteCarloTreeSearchAlgorithm::runSimulations(std::size_t movesToSimulate) {
     statistics.clear();
     while (movesToSimulate > 0) {
-        movesToSimulate -= simulateGame(movesToSimulate);
+        const std::size_t gameMaxMoves = Game6561::MAX_MOVES - gameGameProgressPtr->getMoveCounter();
+        const std::size_t localMaxMovesToSimulate = std::min(std::min(gameMaxMoves, 300u), movesToSimulate);
+        movesToSimulate -= simulateGame(localMaxMovesToSimulate);
     }
 }
 
@@ -114,12 +119,12 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
             }
         } else {
             // selection or simulation with the set policy, depending on where we are in the algorithm
-            if(expensionPhaseHasHappend) {
-                // expansion has happend, we must be simulating, ge next move by random policy
-                theChosenMoveIndex = randomPolicy.getNextMove(localBoard, validMoves, validMovesCount);
-            } else {
-                // it hasnt happend, so we must be expanding, get next move by the chosen policy
+            if (expensionPhaseHasHappend) {
+                // expansion has happend, we must be simulating, get next move by the chosen policy
                 theChosenMoveIndex = policy.getNextMove(localBoard, validMoves, validMovesCount);
+            } else {
+                // it hasnt happend, so we must be expanding, get next move by random policy
+                theChosenMoveIndex = randomPolicy.getNextMove(localBoard, validMoves, validMovesCount);
             }
         }
 
@@ -129,8 +134,8 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
         maxScoreOfSimulation = std::max(maxScoreOfSimulation, localBoard.getBoardScore());
 
         if (!expensionPhaseHasHappend && statistics.find(localBoard) == statistics.end()) {
-            expensionPhaseHasHappend = true;
             statistics.insert(std::make_pair(localBoard, Statistic {0, 0}));
+            expensionPhaseHasHappend = true;
         }
 
         visitedBoardStates.push_front(localBoard);
@@ -138,26 +143,29 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
         ++simulatedMovesCount;
     }
 
-    std::uint32_t initScore = 0;
+//    std::uint32_t initScore = 0;
+    bool first = true;
     for (const Board& visitedBoard : visitedBoardStates) {
         auto it = statistics.find(visitedBoard);
         if (it != statistics.end()) {
             Statistic& stat = it->second;
             ++stat.playCount;
 
-            if (initScore == 0) {
+            if (first) {
+                first = false;
                 // first board in visitied list that exists in the statistics, so it has to be the just expanded board
                 // this means this board should have the value of the just done simulation
                 stat.score = maxScoreOfSimulation;
-                initScore = stat.score;
             } else {
                 // otherwise do fancy shizz
+                // TODO dont forget to set this macro in de merged file
 #if BP_STRATEGY == 1
-                stat.score = std::max(stat.score, initScore);
+                stat.score = std::max(stat.score, maxScoreOfSimulation);
 #endif
 #if BP_STRATEGY == 2
                 stat.score += initScore;
 #endif
+                // TODO backpropaganda with a score list, append score to list each time playCount is incremented
             }
         }
     }
