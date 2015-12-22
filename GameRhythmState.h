@@ -1,6 +1,8 @@
 #ifndef CODECUP_GAMERHYTHMSTATE_H
 #define CODECUP_GAMERHYTHMSTATE_H
 
+#include "Piece.h"
+
 /**
  * An enumeration to keep track of the Rhythm, applied in the 6561 game.
  * This "rhythm" decides what to do in the current turn.
@@ -10,6 +12,8 @@ enum GameRhythmState {
 };
 
 bool gameRhythmStateIsSlide(const GameRhythmState& gameRhythmState);
+
+bool gameRhythmStateEqualsColor(const GameRhythmState& gameRhythmState, PieceColor color);
 
 GameRhythmState& operator++(GameRhythmState& gameRhythmState);
 

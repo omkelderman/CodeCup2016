@@ -113,8 +113,14 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
                 }
             }
         } else {
-            // selection with random, or simulation with random, depending on where we are in the algorithm
-            theChosenMoveIndex = policy.getNextMove(localBoard, validMoves, validMovesCount);
+            // selection or simulation with the set policy, depending on where we are in the algorithm
+            if(expensionPhaseHasHappend) {
+                // expansion has happend, we must be simulating, ge next move by random policy
+                theChosenMoveIndex = randomPolicy.getNextMove(localBoard, validMoves, validMovesCount);
+            } else {
+                // it hasnt happend, so we must be expanding, get next move by the chosen policy
+                theChosenMoveIndex = policy.getNextMove(localBoard, validMoves, validMovesCount);
+            }
         }
 
         // update localBoard with the chosen move

@@ -1,21 +1,29 @@
 #include "Move.h"
-Move::Move() { }
 
-Move::Move(const Coords& coords) : coords(coords) {
-}
+Coords::Coords() :
+        row(0), column(0) {
 
-Move::Move(coord row, coord column) : coords(row, column){
-}
-
-Move::Move(const SlideDirection& direction) : direction(direction) {
 }
 
 Coords::Coords(coord row, coord column) :
         row(row), column(column) {
 }
 
-bool Coords::operator==(const Coords& coords) {
+bool Coords::operator==(const Coords& coords) const {
     return row == coords.row && column == coords.column;
+}
+
+Coords Coords::operator-(const Coords& otherCoords) const {
+    return Coords(row - otherCoords.row, column - otherCoords.column);
+}
+
+Coords Coords::operator+(const Coords& otherCoords) const {
+    return Coords(row + otherCoords.row, column + otherCoords.column);
+}
+
+
+Coords Coords::mirror() const {
+    return Coords(coord(3) - row, coord(3) - column);
 }
 
 std::ostream& operator<<(std::ostream& ostream, const Coords& coords) {
@@ -62,4 +70,18 @@ std::istream& operator>>(std::istream& istream, SlideDirection& direction) {
             break;
     }
     return istream;
+}
+
+Move::Move() { }
+
+Move::Move(const Coords& coords) :
+        coords(coords) {
+}
+
+Move::Move(coord row, coord column) :
+        coords(row, column) {
+}
+
+Move::Move(const SlideDirection& direction) :
+        direction(direction) {
 }

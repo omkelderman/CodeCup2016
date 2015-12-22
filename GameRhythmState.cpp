@@ -4,6 +4,20 @@ bool gameRhythmStateIsSlide(const GameRhythmState& gameRhythmState) {
     return gameRhythmState == GR_SLIDE1 || gameRhythmState == GR_SLIDE2;
 }
 
+bool gameRhythmStateEqualsColor(const GameRhythmState& gameRhythmState, PieceColor color) {
+    switch (gameRhythmState) {
+
+        case GR_BLUE:
+            return color == BLUE;
+        case GR_RED:
+            return color == RED;
+        case GR_GREY:
+            return color == GREY;
+        default:
+            return false;
+    }
+}
+
 GameRhythmState& operator++(GameRhythmState& gameRhythmState) {
     switch (gameRhythmState) {
         case GR_BLUE:

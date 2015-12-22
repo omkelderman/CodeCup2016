@@ -5,8 +5,8 @@
 int main() {
 
     try {
-        RandomMonteCarloPolicy policy;
-        MonteCarloTreeSearchAlgorithm algorithm(20000, 2, policy);
+        HeuristicMonteCarloPolicy policy;
+        MonteCarloTreeSearchAlgorithm algorithm(25000, 1.3, policy);
         std::cerr << "START" << std::endl;
         Game6561 game(std::cin, std::cout, std::cerr, algorithm);
         game.run();

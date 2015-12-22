@@ -9,9 +9,14 @@ struct Coords {
     coord row;
     coord column;
 
+    Coords();
     Coords(coord row, coord column);
 
-    bool operator==(const Coords& coords);
+    bool operator==(const Coords& coords) const;
+    Coords operator-(const Coords& otherCoords) const;
+    Coords operator+(const Coords& otherCoords) const;
+
+    Coords mirror() const;
 };
 
 enum SlideDirection {

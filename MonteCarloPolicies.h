@@ -24,4 +24,21 @@ private:
     std::mt19937 randomGenerator;
 };
 
+class HeuristicMonteCarloPolicy : public MonteCarloPolicy {
+public:
+    virtual std::size_t getNextMove(const Board& board, Move* validMoves, std::size_t validMovesCount);
+private:
+
+    std::size_t getNextSlideMove(const Board& board, Move* validMoves, std::size_t validMovesCount);
+    std::size_t getNextCoordsMove(const Board& board, Move* validMoves, std::size_t validMovesCount);
+
+    std::size_t getIndexOfMove(Move* validMoves, std::size_t validMovesCount, const Coords& coords);
+
+    /**
+     * rhythmColor must be one of the colors
+     * color must not be equal to the rhythmColor
+     */
+    PieceColor determineOtherJunkColor(const GameRhythmState& rhythmColor, const PieceColor& color);
+};
+
 #endif //CODECUP_MONTECARLOPOLICIES_H

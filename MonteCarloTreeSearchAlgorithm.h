@@ -28,6 +28,7 @@ private:
     const double ucb1Constant;
 
     MonteCarloPolicy& policy;
+    RandomMonteCarloPolicy randomPolicy;
 
     Move nextMove;
     Statistics statistics;

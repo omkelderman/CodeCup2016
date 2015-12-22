@@ -18,7 +18,8 @@ bool Board::operator<(const Board& otherBoard) const {
         for (coord row = 0; row < 4; ++row) {
             for (coord column = 0; column < 4; ++column) {
                 if (pieces[row][column].value == otherBoard.pieces[row][column].value) {
-                    if(pieces[row][column].value != 0 && pieces[row][column].color != otherBoard.pieces[row][column].color) {
+                    if (pieces[row][column].value != 0 &&
+                        pieces[row][column].color != otherBoard.pieces[row][column].color) {
                         return pieces[row][column].color < otherBoard.pieces[row][column].color;
                     }
                 } else {
@@ -125,6 +126,10 @@ void Board::doMove(const Move& move) {
             slide(move.direction);
             break;
     }
+}
+
+const Piece& Board::getPiece(const Coords& coords) const {
+    return getPiece(coords.row, coords.column);
 }
 
 const Piece& Board::getPiece(coord row, coord column) const {
@@ -329,4 +334,159 @@ std::size_t Board::getValidMoves(Move validMoves[16]) const {
         }
     }
     return validMoveCounter;
+}
+
+const Piece* Board::getPieceByMaxValue(Coords& coords) const {
+    const Piece* maxPiece = &pieces[coords.row][coords.column];
+    for (coord column = 0; column < 4; ++column) {
+        for (coord row = 0; row < 4; ++row) {
+            if (pieces[row][column].value > maxPiece->value) {
+                maxPiece = &pieces[row][column];
+                coords.row = row;
+                coords.column = column;
+            }
+        }
+    }
+
+    return maxPiece;
+}
+
+bool Board::getPieceByMinValue(Coords& coords, Coords* blacklist /* = nullptr */,
+                               std::size_t blacklistSize /* = 0 */) const {
+    unsigned short minValue = UINT16_MAX;
+
+    for (coord column = 0; column < 4; ++column) {
+        for (coord row = 0; row < 4; ++row) {
+            if (pieces[row][column].empty()) {
+                continue;
+            }
+
+            bool inBlackList = false;
+            for (std::size_t i = 0; i < blacklistSize; ++i) {
+                if(blacklist[i].row == row && blacklist[i].column == column) {
+                    inBlackList = true;
+                }
+            }
+            if (!inBlackList && pieces[row][column].value < minValue) {
+                minValue = pieces[row][column].value;
+                coords.row = row;
+                coords.column = column;
+            }
+        }
+    }
+
+    return minValue != UINT16_MAX;
+}
+
+const Piece* Board::getPieceByColorAndValue(const PieceColor& color, unsigned short value, Coords& coords) const {
+    for (coord column = 0; column < 4; ++column) {
+        for (coord row = 0; row < 4; ++row) {
+            if (pieces[row][column].color == color && pieces[row][column].value == value) {
+                coords.row = row;
+                coords.column = column;
+                return &pieces[row][column];
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+bool Board::isPieceEmpty(coord row, coord column) const {
+    return pieces[row][column].empty();
+}
+
+bool Board::isPieceEmpty(const Coords& coords) const {
+    return isPieceEmpty(coords.row, coords.column);
+}
+
+std::size_t Board::findAdjecentPiecesWithSameColor(const Coords& coords, PieceColor color,
+                                                   AdjacentPieceInfo* adjacentPieces) const {
+    std::size_t adjacentPiecesCount = 0;
+    // check left
+    if (coords.column > 1) {
+        const Coords& leftCoords = coords - Coords(0, 1);
+        const Piece& leftPiece = getPiece(leftCoords);
+        if (!leftPiece.empty() && leftPiece.color == color) {
+            adjacentPieces[adjacentPiecesCount].adjacentPieceCoords = leftCoords;
+            adjacentPieces[adjacentPiecesCount].adjacentPieceValue = leftPiece.value;
+            adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPieceSize = findEmptyAdjacentPieces(
+                    adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPiece, leftCoords);
+            adjacentPiecesCount++;
+        }
+    }
+    // check right
+    if (coords.column < 3) {
+        const Coords& rightCoords = coords + Coords(0, 1);
+        const Piece& rightPiece = getPiece(rightCoords);
+        if (!rightPiece.empty() && rightPiece.color == color) {
+            adjacentPieces[adjacentPiecesCount].adjacentPieceCoords = rightCoords;
+            adjacentPieces[adjacentPiecesCount].adjacentPieceValue = rightPiece.value;
+            adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPieceSize = findEmptyAdjacentPieces(
+                    adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPiece, rightCoords);
+            adjacentPiecesCount++;
+        }
+    }
+    // check up
+    if (coords.row > 1) {
+        const Coords& upCoords = coords - Coords(1, 0);
+        const Piece& upPiece = getPiece(upCoords);
+        if (!upPiece.empty() && upPiece.color == color) {
+            adjacentPieces[adjacentPiecesCount].adjacentPieceCoords = upCoords;
+            adjacentPieces[adjacentPiecesCount].adjacentPieceValue = upPiece.value;
+            adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPieceSize = findEmptyAdjacentPieces(
+                    adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPiece, upCoords);
+            adjacentPiecesCount++;
+        }
+    }
+    // check down
+    if (coords.row < 3) {
+        const Coords& downCoords = coords + Coords(1, 0);
+        const Piece& downPiece = getPiece(downCoords);
+        if (!downPiece.empty() && downPiece.color == color) {
+            adjacentPieces[adjacentPiecesCount].adjacentPieceCoords = downCoords;
+            adjacentPieces[adjacentPiecesCount].adjacentPieceValue = downPiece.value;
+            adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPieceSize = findEmptyAdjacentPieces(
+                    adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPiece, downCoords);
+            adjacentPiecesCount++;
+        }
+    }
+    return adjacentPiecesCount;
+}
+
+size_t Board::findEmptyAdjacentPieces(Coords adjacentEmptyPieces[3], const Coords& coords) const {
+    std::size_t adjacentPiecesCount = 0;
+    // check left
+    if (coords.column > 1) {
+        const Coords& leftCoords = coords - Coords(0, 1);
+        if (getPiece(leftCoords).empty()) {
+            adjacentEmptyPieces[adjacentPiecesCount] = leftCoords;
+            ++adjacentPiecesCount;
+        }
+    }
+    // check right
+    if (coords.column < 3) {
+        const Coords& rightCoords = coords + Coords(0, 1);
+        if (getPiece(rightCoords).empty()) {
+            adjacentEmptyPieces[adjacentPiecesCount] = rightCoords;
+            ++adjacentPiecesCount;
+        }
+    }
+    // check up
+    if (coords.row > 1) {
+        const Coords& upCoords = coords - Coords(1, 0);
+        if (getPiece(upCoords).empty()) {
+            adjacentEmptyPieces[adjacentPiecesCount] = upCoords;
+            ++adjacentPiecesCount;
+        }
+    }
+    // check down
+    if (coords.row < 3) {
+        const Coords& downCoords = coords + Coords(1, 0);
+        if (getPiece(downCoords).empty()) {
+            adjacentEmptyPieces[adjacentPiecesCount] = downCoords;
+            ++adjacentPiecesCount;
+        }
+    }
+    return adjacentPiecesCount;
 }
