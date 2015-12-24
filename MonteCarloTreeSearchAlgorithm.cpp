@@ -2,6 +2,7 @@
 #include "MonteCarloTreeSearchAlgorithm.h"
 #include "Game6561.h"
 #include <forward_list>
+#include <algorithm>
 
 MonteCarloTreeSearchAlgorithm::MonteCarloTreeSearchAlgorithm(std::size_t movesToSimulate, double ucb1Constant,
                                                              MonteCarloPolicy& policy) : MonteCarloTreeSearchAlgorithm(movesToSimulate, ucb1Constant, 1000u, policy) {
@@ -73,7 +74,7 @@ void MonteCarloTreeSearchAlgorithm::runSimulations(std::size_t movesToSimulate) 
     std::size_t simulateGameCount = 0;
     while (movesToSimulate > 0) {
         const std::size_t gameMaxMoves = Game6561::MAX_MOVES - gameGameProgressPtr->getMoveCounter();
-        const std::size_t localMaxMovesToSimulate = std::min(std::min(gameMaxMoves, 300u), movesToSimulate);
+        const std::size_t localMaxMovesToSimulate = std::min(std::min(gameMaxMoves, maxLocalMovesToSimulate), movesToSimulate);
         movesToSimulate -= simulateGame(localMaxMovesToSimulate);
         ++simulateGameCount;
     }
@@ -123,7 +124,7 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
             double maxUcb1Value = 0;
             for (std::size_t validIndex = 0; validIndex < validMovesCount; ++validIndex) {
                 Statistic& stat = statistics[validNextBoards[validIndex]];
-                double ucb1Value = stat.score + ucb1Constant * std::sqrt(logOfPlayCountSum / stat.playCount);
+                double ucb1Value = (((double)stat.score)/stat.playCount) + ucb1Constant * std::sqrt(logOfPlayCountSum / stat.playCount);
                 if (ucb1Value > maxUcb1Value) {
                     maxUcb1Value = ucb1Value;
                     theChosenMoveIndex = validIndex;
@@ -170,13 +171,14 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
             } else {
                 // otherwise do fancy shizz
                 // TODO dont forget to set this macro in de merged file
-#if BP_STRATEGY == 1
-                stat.score = std::max(stat.score, maxScoreOfSimulation);
-#endif
-#if BP_STRATEGY == 2
+//#if BP_STRATEGY == 1
+//                stat.score = std::max(stat.score, maxScoreOfSimulation);
+//#endif
+//#if BP_STRATEGY == 2
+//                stat.score += maxScoreOfSimulation;
+//#endif
+//                // TODO backpropaganda with a score list, append score to list each time playCount is incremented
                 stat.score += maxScoreOfSimulation;
-#endif
-                // TODO backpropaganda with a score list, append score to list each time playCount is incremented
             }
         }
     }
