@@ -6,7 +6,7 @@ int main() {
 
     try {
         HeuristicMonteCarloPolicy policy;
-        MonteCarloTreeSearchAlgorithm algorithm(20000, 1.3, 300u, policy);
+        MonteCarloTreeSearchAlgorithm algorithm(500000, 1.3, policy);
         std::cerr << "START" << std::endl;
         Game6561 game(std::cin, std::cout, std::cerr, algorithm);
         game.run();

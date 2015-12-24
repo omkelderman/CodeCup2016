@@ -4,6 +4,10 @@
 #include <forward_list>
 
 MonteCarloTreeSearchAlgorithm::MonteCarloTreeSearchAlgorithm(std::size_t movesToSimulate, double ucb1Constant,
+                                                             MonteCarloPolicy& policy) : MonteCarloTreeSearchAlgorithm(movesToSimulate, ucb1Constant, 1000u, policy) {
+}
+
+MonteCarloTreeSearchAlgorithm::MonteCarloTreeSearchAlgorithm(std::size_t movesToSimulate, double ucb1Constant,
                                                              std::size_t maxLocalMovesToSimulate,
                                                              MonteCarloPolicy& policy) :
         movesToSimulate(movesToSimulate), ucb1Constant(ucb1Constant), maxLocalMovesToSimulate(maxLocalMovesToSimulate),
@@ -65,12 +69,20 @@ void MonteCarloTreeSearchAlgorithm::ensureValidState() {
 }
 
 void MonteCarloTreeSearchAlgorithm::runSimulations(std::size_t movesToSimulate) {
-    statistics.clear();
+    prepareStatisticsForNextRun();
+    std::size_t simulateGameCount = 0;
     while (movesToSimulate > 0) {
         const std::size_t gameMaxMoves = Game6561::MAX_MOVES - gameGameProgressPtr->getMoveCounter();
         const std::size_t localMaxMovesToSimulate = std::min(std::min(gameMaxMoves, 300u), movesToSimulate);
         movesToSimulate -= simulateGame(localMaxMovesToSimulate);
+        ++simulateGameCount;
     }
+    std::cerr << "simulateGameCount: " << simulateGameCount << ", statistics.size(): " << statistics.size() <<
+    std::endl;
+}
+
+void MonteCarloTreeSearchAlgorithm::prepareStatisticsForNextRun() {
+    statistics.clear();
 }
 
 std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesToSimulate) {
