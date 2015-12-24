@@ -143,7 +143,6 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
         ++simulatedMovesCount;
     }
 
-//    std::uint32_t initScore = 0;
     bool first = true;
     for (const Board& visitedBoard : visitedBoardStates) {
         auto it = statistics.find(visitedBoard);
@@ -163,7 +162,7 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
                 stat.score = std::max(stat.score, maxScoreOfSimulation);
 #endif
 #if BP_STRATEGY == 2
-                stat.score += initScore;
+                stat.score += maxScoreOfSimulation;
 #endif
                 // TODO backpropaganda with a score list, append score to list each time playCount is incremented
             }
