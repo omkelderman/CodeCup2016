@@ -5,10 +5,6 @@
 #include <algorithm>
 
 MonteCarloTreeSearchAlgorithm::MonteCarloTreeSearchAlgorithm(std::size_t movesToSimulate, double ucb1Constant,
-                                                             MonteCarloPolicy& policy) : MonteCarloTreeSearchAlgorithm(movesToSimulate, ucb1Constant, 1000u, policy) {
-}
-
-MonteCarloTreeSearchAlgorithm::MonteCarloTreeSearchAlgorithm(std::size_t movesToSimulate, double ucb1Constant,
                                                              std::size_t maxLocalMovesToSimulate,
                                                              MonteCarloPolicy& policy) :
         movesToSimulate(movesToSimulate), ucb1Constant(ucb1Constant), maxLocalMovesToSimulate(maxLocalMovesToSimulate),
