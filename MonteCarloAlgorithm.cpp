@@ -2,12 +2,9 @@
 #include <algorithm>
 #include "MonteCarloAlgorithm.h"
 
-// constants
-const int MonteCarloAlgorithm::SIMULATIONS_THRESHOLD = 10;
-const std::size_t MonteCarloAlgorithm::MOVES_TO_SIMULATE = 100000;
-
-MonteCarloAlgorithm::MonteCarloAlgorithm() :
-        Algorithm(), bestSimulation(nullptr) {
+MonteCarloAlgorithm::MonteCarloAlgorithm(int simulationsThreshold, std::size_t movesToSimulate) :
+        Algorithm(), simulationsThreshold(simulationsThreshold), movesToSimulate(movesToSimulate),
+        bestSimulation(nullptr) {
 }
 
 const Coords MonteCarloAlgorithm::calculateRedMove() const {
@@ -61,7 +58,7 @@ void MonteCarloAlgorithm::ensureValidState() {
         updateBestSimulation();
     }
     if (shouldSimulateMore()) {
-        simulate(MOVES_TO_SIMULATE);
+        simulate(movesToSimulate);
     }
 }
 
@@ -74,7 +71,7 @@ void MonteCarloAlgorithm::updateBestSimulation() {
 }
 
 bool MonteCarloAlgorithm::shouldSimulateMore() const {
-    return distance(simulations.begin(), simulations.end()) < SIMULATIONS_THRESHOLD;
+    return distance(simulations.begin(), simulations.end()) < simulationsThreshold;
 }
 
 void MonteCarloAlgorithm::simulate(std::size_t movesToCalculate) {

@@ -11,7 +11,7 @@
 
 class MonteCarloAlgorithm : public Algorithm {
 public:
-    MonteCarloAlgorithm();
+    MonteCarloAlgorithm(int simulationsThreshold, std::size_t movesToSimulate);
 
     virtual const Coords calculateRedMove() const;
     virtual const Coords calculateBlueMove() const;
@@ -24,8 +24,9 @@ public:
 
 private:
     // constants
-    static const int SIMULATIONS_THRESHOLD;
-    static const std::size_t MOVES_TO_SIMULATE;
+    const int simulationsThreshold;
+    const std::size_t movesToSimulate;
+
     // random generator
     RandomMonteCarloPolicy randomMonteCarloPolicy;
 
