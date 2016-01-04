@@ -165,15 +165,8 @@ std::size_t MonteCarloTreeSearchAlgorithm::simulateGame(const std::size_t movesT
                 // this means this board should have the value of the just done simulation
                 stat.score = maxScoreOfSimulation;
             } else {
-                // otherwise do fancy shizz
-                // TODO dont forget to set this macro in de merged file
-//#if BP_STRATEGY == 1
-//                stat.score = std::max(stat.score, maxScoreOfSimulation);
-//#endif
-//#if BP_STRATEGY == 2
-//                stat.score += maxScoreOfSimulation;
-//#endif
-//                // TODO backpropaganda with a score list, append score to list each time playCount is incremented
+                // otherwise do back-propagation by adding the value to the score field. Later on this will be divided
+                // by the play-count so it will be an average.
                 stat.score += maxScoreOfSimulation;
             }
         }
