@@ -211,8 +211,8 @@ bool Board::isSlideValid(const SlideDirection& slideDirection) const {
 
 std::uint32_t Board::getBoardScore() const {
     std::uint32_t score = 0;
-    for (coord row = 0; row < 3; ++row) {
-        for (coord column = 0; column < 3; ++column) {
+    for (coord row = 0; row < 4; ++row) {
+        for (coord column = 0; column < 4; ++column) {
             score += pieces[row][column].value;
         }
     }
@@ -426,7 +426,7 @@ bool Board::isPieceEmpty(const Coords& coords) const {
     return isPieceEmpty(coords.row, coords.column);
 }
 
-std::size_t Board::findAdjecentPiecesWithSameColor(const Coords& coords, PieceColor color,
+    std::size_t Board::findAdjecentPiecesWithSameColor(const Coords& coords, PieceColor color,
                                                    AdjacentPieceInfo* adjacentPieces) const {
     std::size_t adjacentPiecesCount = 0;
     // check left
