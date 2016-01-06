@@ -30,10 +30,44 @@ std::size_t HeuristicMonteCarloPolicy::getNextMove(const Board& board, Move* val
 std::size_t HeuristicMonteCarloPolicy::getNextSlideMove(const Board& board, Move* validMoves,
                                                         std::size_t validMovesCount) {
     Board boardsAfterSlide[4] = {board, board, board, board};
+    Coords maxPieceCoords;
+    const Piece* maxPiece = board.getPieceByMaxValue(maxPieceCoords);
+    PieceColor color = maxPiece->empty() ? GREY : maxPiece->color;
+    SlideResult slideResults[4] = {SlideResult(color), SlideResult(color), SlideResult(color), SlideResult(color)};
     for (std::size_t i = 0; i < validMovesCount; ++i) {
-        boardsAfterSlide[i].slide(validMoves[i].direction);
+        boardsAfterSlide[i].slide(validMoves[i].direction, &slideResults[i]);
     }
     std::size_t theChoosenSlideIndex = 0;
+    std::size_t maxAmount = 0;
+
+    // check for the slide with the max merged pieces of the same color
+    for(std::size_t i = 0; i < validMovesCount; ++i) {
+        if(slideResults[i].merged > maxAmount) {
+            maxAmount = slideResults[i].merged;
+            theChoosenSlideIndex = i;
+        }
+    }
+
+    if(maxAmount > 0) {
+        // found one
+        return theChoosenSlideIndex;
+    }
+
+    // check for the slide which removes colors other than active color
+    for(std::size_t i = 0; i < validMovesCount; ++i) {
+        if(slideResults[i].removed_other > maxAmount) {
+            maxAmount = slideResults[i].removed_other;
+            theChoosenSlideIndex = i;
+        }
+    }
+
+    if(maxAmount > 0) {
+        // found one
+        return theChoosenSlideIndex;
+    }
+
+
+    // no logic left, just do best slide
     std::uint32_t maxScore = 0;
     for (std::size_t i = 0; i < validMovesCount; ++i) {
         uint32_t boardScore = boardsAfterSlide[i].getBoardScore();

@@ -2,6 +2,10 @@
 
 #include <stdexcept>
 
+SlideResult::SlideResult(PieceColor activeColor) :
+        activeColor(activeColor), merged(0), merged_other(0), removed(0), removed_other(0), changed(false) {
+}
+
 Board::Board() :
         gameRhythmState(GR_BLUE) {
 }
@@ -61,51 +65,51 @@ Board& Board::setPiece(const Coords& coords, PieceColor color, unsigned short va
     return *this;
 }
 
-void Board::slide(SlideDirection direction) {
+void Board::slide(SlideDirection direction, SlideResult* slideResult /*= nullptr*/) {
     switch (direction) {
         case SD_UP:
-            slideUp();
+            slideUp(slideResult);
             break;
         case SD_DOWN:
-            slideDown();
+            slideDown(slideResult);
             break;
         case SD_LEFT:
-            slideLeft();
+            slideLeft(slideResult);
             break;
         case SD_RIGHT:
-            slideRight();
+            slideRight(slideResult);
             break;
     }
 }
 
-void Board::slideUp() {
+void Board::slideUp(SlideResult* slideResult /*= nullptr*/) {
     for (coord column = 0; column < 4; ++column) {
         Piece* localPieces[] = {&(pieces[0][column]), &(pieces[1][column]), &(pieces[2][column]), &(pieces[3][column])};
-        slidePieces(localPieces);
+        slidePieces(localPieces, slideResult);
     }
     ++gameRhythmState;
 }
 
-void Board::slideDown() {
+void Board::slideDown(SlideResult* slideResult /*= nullptr*/) {
     for (coord column = 0; column < 4; ++column) {
         Piece* localPieces[] = {&(pieces[3][column]), &(pieces[2][column]), &(pieces[1][column]), &(pieces[0][column])};
-        slidePieces(localPieces);
+        slidePieces(localPieces, slideResult);
     }
     ++gameRhythmState;
 }
 
-void Board::slideLeft() {
+void Board::slideLeft(SlideResult* slideResult /*= nullptr*/) {
     for (coord row = 0; row < 4; ++row) {
         Piece* localPieces[] = {&pieces[row][0], &pieces[row][1], &pieces[row][2], &pieces[row][3]};
-        slidePieces(localPieces);
+        slidePieces(localPieces, slideResult);
     }
     ++gameRhythmState;
 }
 
-void Board::slideRight() {
+void Board::slideRight(SlideResult* slideResult /*= nullptr*/) {
     for (coord row = 0; row < 4; ++row) {
         Piece* localPieces[] = {&pieces[row][3], &pieces[row][2], &pieces[row][1], &pieces[row][0]};
-        slidePieces(localPieces);
+        slidePieces(localPieces, slideResult);
     }
     ++gameRhythmState;
 }
@@ -150,17 +154,20 @@ bool Board::isSlideValid(const SlideDirection& slideDirection) const {
     return false;
 }
 
-/* static */ void Board::slidePieces(Piece* pieces[]) {
-    removeWhitespace(pieces);
-    removeDuplicates(pieces);
-    removeWhitespace(pieces);
+/* static */ void Board::slidePieces(Piece* pieces[], SlideResult* slideResult /*= nullptr*/) {
+    removeWhitespace(pieces, slideResult);
+    removeDuplicates(pieces, slideResult);
+    removeWhitespace(pieces, slideResult);
 }
 
-/* static */ void Board::removeWhitespace(Piece* pieces[]) {
+/* static */ void Board::removeWhitespace(Piece* pieces[], SlideResult* slideResult /*= nullptr*/) {
     for (coord i = 0; i < 4; ++i) {
         if (pieces[i]->empty()) {
             for (int j = i + 1; j < 4; ++j) {
                 if (!pieces[j]->empty()) {
+                    if (slideResult) {
+                        slideResult->changed = true;
+                    }
                     pieces[i]->replaceWith(*pieces[j]);
                     break;
                 }
@@ -169,14 +176,33 @@ bool Board::isSlideValid(const SlideDirection& slideDirection) const {
     }
 }
 
-/* static */ void Board::removeDuplicates(Piece* pieces[]) {
+/* static */ void Board::removeDuplicates(Piece* pieces[], SlideResult* slideResult /*= nullptr*/) {
     for (coord i = 0; i < 3; ++i) {
         if (!pieces[i]->empty() && (pieces[i]->value == pieces[i + 1]->value)) {
+            if (slideResult) {
+                slideResult->changed = true;
+            }
             // is mergable, lets check how to merge
             if (pieces[i]->color == pieces[i + 1]->color) {
                 pieces[i]->value *= 3;
+                // merged
+                if (slideResult) {
+                    if (slideResult->activeColor == pieces[i]->color) {
+                        ++(slideResult->merged);
+                    } else {
+                        ++(slideResult->merged_other);
+                    }
+                }
             } else {
                 pieces[i]->clear();
+                // removed
+                if (slideResult) {
+                    if (slideResult->activeColor == pieces[i]->color) {
+                        ++(slideResult->removed);
+                    } else {
+                        ++(slideResult->removed_other);
+                    }
+                }
             }
             pieces[i + 1]->clear();
         }
@@ -363,7 +389,7 @@ bool Board::getPieceByMinValue(Coords& coords, Coords* blacklist /* = nullptr */
 
             bool inBlackList = false;
             for (std::size_t i = 0; i < blacklistSize; ++i) {
-                if(blacklist[i].row == row && blacklist[i].column == column) {
+                if (blacklist[i].row == row && blacklist[i].column == column) {
                     inBlackList = true;
                 }
             }

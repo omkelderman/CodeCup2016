@@ -6,6 +6,17 @@
 #include "GameRhythmState.h"
 #include "AdjacentPieceInfo.h"
 
+struct SlideResult {
+    SlideResult(PieceColor activeColor);
+
+    PieceColor activeColor;
+    std::size_t merged;
+    std::size_t merged_other;
+    std::size_t removed;
+    std::size_t removed_other;
+    bool changed;
+};
+
 class Board {
 public:
     Board();
@@ -20,11 +31,11 @@ public:
 
     // do move methods
     Board& setPiece(const Coords& coords, PieceColor color, unsigned short value = 1);
-    void slide(SlideDirection direction);
-    void slideUp();
-    void slideDown();
-    void slideLeft();
-    void slideRight();
+    void slide(SlideDirection direction, SlideResult* slideResult = nullptr);
+    void slideUp(SlideResult* slideResult = nullptr);
+    void slideDown(SlideResult* slideResult = nullptr);
+    void slideLeft(SlideResult* slideResult = nullptr);
+    void slideRight(SlideResult* slideResult = nullptr);
     void doMove(const Move& move);
 
     const Piece& getPiece(const Coords& coords) const;
@@ -74,9 +85,9 @@ private:
      * Array-size should be 4
      * Slides towards p0
      */
-    static void slidePieces(Piece* pieces[]);
-    static void removeWhitespace(Piece* pieces[]);
-    static void removeDuplicates(Piece* pieces[]);
+    static void slidePieces(Piece* pieces[], SlideResult* slideResult = nullptr);
+    static void removeWhitespace(Piece* pieces[], SlideResult* slideResult = nullptr);
+    static void removeDuplicates(Piece* pieces[], SlideResult* slideResult = nullptr);
 
     bool isSlideUpValid() const;
     bool isSlideDownValid() const;
