@@ -41,27 +41,27 @@ std::size_t HeuristicMonteCarloPolicy::getNextSlideMove(const Board& board, Move
     std::size_t maxAmount = 0;
 
     // check for the slide with the max merged pieces of the same color
-    for(std::size_t i = 0; i < validMovesCount; ++i) {
-        if(slideResults[i].merged > maxAmount) {
+    for (std::size_t i = 0; i < validMovesCount; ++i) {
+        if (slideResults[i].merged > maxAmount) {
             maxAmount = slideResults[i].merged;
             theChoosenSlideIndex = i;
         }
     }
 
-    if(maxAmount > 0) {
+    if (maxAmount > 0) {
         // found one
         return theChoosenSlideIndex;
     }
 
     // check for the slide which removes colors other than active color
-    for(std::size_t i = 0; i < validMovesCount; ++i) {
-        if(slideResults[i].removed_other > maxAmount) {
+    for (std::size_t i = 0; i < validMovesCount; ++i) {
+        if (slideResults[i].removed_other > maxAmount) {
             maxAmount = slideResults[i].removed_other;
             theChoosenSlideIndex = i;
         }
     }
 
-    if(maxAmount > 0) {
+    if (maxAmount > 0) {
         // found one
         return theChoosenSlideIndex;
     }
@@ -87,45 +87,48 @@ std::size_t HeuristicMonteCarloPolicy::getNextCoordsMove(const Board& board, Mov
 
     if (gameRhythmStateEqualsColor(board.getGameRhythmState(), color)) {
         // get adjacent piece
-        AdjacentPieceInfo adjacentPieces[4];
-        std::size_t adjacentPiecesSize = board.findAdjecentPiecesWithSameColor(maxPieceCoords, color, adjacentPieces);
+        PieceInfo pieceInfos[16];
+        std::size_t pieceInfoSize = board.getClustorOfPiecesWithSameColor(maxPieceCoords, color, maxPiece->value,
+                                                                          pieceInfos);
 
-        if (adjacentPiecesSize > 0) {
+        if (pieceInfoSize > 0) {
             // check for values 1
-            for (std::size_t i = 0; i < adjacentPiecesSize; ++i) {
-                if (adjacentPieces[i].adjacentPieceValue == 1 &&
-                    adjacentPieces[i].emptyAdjacentPlacesOfAdjacentPieceSize > 0) {
+            for (std::size_t i = 0; i < pieceInfoSize; ++i) {
+                if (pieceInfos[i].value == 1 && pieceInfos[i].emptyAdjacentPlacesCount > 0) {
                     // value correct and has empty adjecent piece
-                    return getIndexOfMove(validMoves, validMovesCount, adjacentPieces[i].emptyAdjacentPlacesOfAdjacentPiece[0]);
+                    return getIndexOfMove(validMoves, validMovesCount, pieceInfos[i].emptyAdjacentPlaces[0]);
                 }
             }
 
             // check for values 3
-            for (std::size_t i = 0; i < adjacentPiecesSize; ++i) {
-                if (adjacentPieces[i].adjacentPieceValue == 3 &&
-                    adjacentPieces[i].emptyAdjacentPlacesOfAdjacentPieceSize > 0) {
+            for (std::size_t i = 0; i < pieceInfoSize; ++i) {
+                if (pieceInfos[i].value == 3 && pieceInfos[i].emptyAdjacentPlacesCount > 0) {
                     // value correct and has empty adjecent piece
-                    return getIndexOfMove(validMoves, validMovesCount, adjacentPieces[i].emptyAdjacentPlacesOfAdjacentPiece[0]);
+                    return getIndexOfMove(validMoves, validMovesCount, pieceInfos[i].emptyAdjacentPlaces[0]);
                 }
             }
+        }
 
-            // check for empty spot on the walls of the board
-            // check left
-            if (board.isPieceEmpty(0, maxPieceCoords.row)) {
-                return getIndexOfMove(validMoves, validMovesCount, {0, maxPieceCoords.row});
-            }
-            // check right
-            if (board.isPieceEmpty(3, maxPieceCoords.row)) {
-                return getIndexOfMove(validMoves, validMovesCount, {3, maxPieceCoords.row});
-            }
-            // check up
-            if (board.isPieceEmpty(maxPieceCoords.column, 0)) {
-                return getIndexOfMove(validMoves, validMovesCount, {maxPieceCoords.column, 0});
-            }
-            // check down
-            if (board.isPieceEmpty(maxPieceCoords.column, 3)) {
-                return getIndexOfMove(validMoves, validMovesCount, {maxPieceCoords.column, 3});
-            }
+        // check for empty spot on the walls of the board
+        // up
+        Coords upCoords(0, maxPieceCoords.column);
+        if (board.isPieceEmpty(upCoords)) {
+            return getIndexOfMove(validMoves, validMovesCount, upCoords);
+        }
+        // down
+        Coords downCoords(3, maxPieceCoords.column);
+        if (board.isPieceEmpty(downCoords)) {
+            return getIndexOfMove(validMoves, validMovesCount, downCoords);
+        }
+        // left
+        Coords leftCoords(maxPieceCoords.row, 0);
+        if (board.isPieceEmpty(leftCoords)) {
+            return getIndexOfMove(validMoves, validMovesCount, leftCoords);
+        }
+        // right
+        Coords rightCoords(maxPieceCoords.row, 3);
+        if (board.isPieceEmpty(rightCoords)) {
+            return getIndexOfMove(validMoves, validMovesCount, rightCoords);
         }
 
         Coords blacklist[16];

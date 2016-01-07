@@ -4,7 +4,7 @@
 #include "Piece.h"
 #include "Move.h"
 #include "GameRhythmState.h"
-#include "AdjacentPieceInfo.h"
+#include "PieceInfo.h"
 
 struct SlideResult {
     SlideResult(PieceColor activeColor);
@@ -69,9 +69,12 @@ public:
     bool isPieceEmpty(coord row, coord column) const;
     bool isPieceEmpty(const Coords& coords) const;
 
-    std::size_t findAdjecentPiecesWithSameColor(const Coords& coords, PieceColor color,
-                                                AdjacentPieceInfo adjacentPieces[4]) const;
-    size_t findEmptyAdjacentPieces(Coords adjacentEmptyPieces[3], const Coords& coords) const;
+    std::size_t getClustorOfPiecesWithSameColor(const Coords& coords, PieceColor color, unsigned short value,
+                                                PieceInfo pieceInfos[16]) const;
+    std::size_t findAdjecentPiecesWithSameColor(const Coords& coords, PieceColor color, PieceInfo adjacentPieces[4],
+                                                const PieceInfo* blacklistBegin = nullptr,
+                                                const PieceInfo* blacklistEnd = nullptr) const;
+    size_t findEmptyAdjacentPieces(Coords adjacentEmptyPieces[], const Coords& coords) const;
 
 private:
     /**

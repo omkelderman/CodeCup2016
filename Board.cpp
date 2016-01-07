@@ -1,6 +1,7 @@
 #include "Board.h"
 
 #include <stdexcept>
+#include <algorithm>
 
 SlideResult::SlideResult(PieceColor activeColor) :
         activeColor(activeColor), merged(0), merged_other(0), removed(0), removed_other(0), changed(false) {
@@ -197,7 +198,8 @@ bool Board::isSlideValid(const SlideDirection& slideDirection) const {
                 pieces[i]->clear();
                 // removed
                 if (slideResult) {
-                    if (slideResult->activeColor == pieces[i]->color) {
+                    if (slideResult->activeColor == pieces[i]->color ||
+                        slideResult->activeColor == pieces[i + 1]->color) {
                         ++(slideResult->removed);
                     } else {
                         ++(slideResult->removed_other);
@@ -426,61 +428,95 @@ bool Board::isPieceEmpty(const Coords& coords) const {
     return isPieceEmpty(coords.row, coords.column);
 }
 
-    std::size_t Board::findAdjecentPiecesWithSameColor(const Coords& coords, PieceColor color,
-                                                   AdjacentPieceInfo* adjacentPieces) const {
+std::size_t Board::getClustorOfPiecesWithSameColor(const Coords& coords, PieceColor color, unsigned short value,
+                                                   PieceInfo pieceInfos[16]) const {
+    // Bastiaan order: left, right, up, down
+    pieceInfos[0].coords = coords;
+    pieceInfos[0].value = value;
+    pieceInfos[0].emptyAdjacentPlacesCount = findEmptyAdjacentPieces(pieceInfos[0].emptyAdjacentPlaces, coords);
+    std::size_t clusterSize = 1;
+
+    for (std::size_t i = 0; i < clusterSize; ++i) {
+        // add new adjecent dingen
+        clusterSize += findAdjecentPiecesWithSameColor(pieceInfos[i].coords, color, &pieceInfos[i + 1], pieceInfos,
+                                                       pieceInfos + clusterSize);
+    }
+
+    return clusterSize;
+}
+
+std::size_t Board::findAdjecentPiecesWithSameColor(const Coords& coords, PieceColor color, PieceInfo adjacentPieces[4],
+                                                   const PieceInfo* blacklistBegin /*= nullptr*/,
+                                                   const PieceInfo* blacklistEnd /*= nullptr*/) const {
     std::size_t adjacentPiecesCount = 0;
     // check left
     if (coords.column > 0) {
         const Coords leftCoords = coords - Coords(0, 1);
-        const Piece& leftPiece = getPiece(leftCoords);
-        if (!leftPiece.empty() && leftPiece.color == color) {
-            adjacentPieces[adjacentPiecesCount].adjacentPieceCoords = leftCoords;
-            adjacentPieces[adjacentPiecesCount].adjacentPieceValue = leftPiece.value;
-            adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPieceSize = findEmptyAdjacentPieces(
-                    adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPiece, leftCoords);
-            adjacentPiecesCount++;
+        if (std::find_if(blacklistBegin, blacklistEnd, [&leftCoords](const PieceInfo& info) {
+            return info.coords == leftCoords;
+        }) == blacklistEnd) {
+            const Piece& leftPiece = getPiece(leftCoords);
+            if (!leftPiece.empty() && leftPiece.color == color) {
+                adjacentPieces[adjacentPiecesCount].coords = leftCoords;
+                adjacentPieces[adjacentPiecesCount].value = leftPiece.value;
+                adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesCount = findEmptyAdjacentPieces(
+                        adjacentPieces[adjacentPiecesCount].emptyAdjacentPlaces, leftCoords);
+                adjacentPiecesCount++;
+            }
         }
     }
     // check right
     if (coords.column < 3) {
         const Coords rightCoords = coords + Coords(0, 1);
-        const Piece& rightPiece = getPiece(rightCoords);
-        if (!rightPiece.empty() && rightPiece.color == color) {
-            adjacentPieces[adjacentPiecesCount].adjacentPieceCoords = rightCoords;
-            adjacentPieces[adjacentPiecesCount].adjacentPieceValue = rightPiece.value;
-            adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPieceSize = findEmptyAdjacentPieces(
-                    adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPiece, rightCoords);
-            adjacentPiecesCount++;
+        if (std::find_if(blacklistBegin, blacklistEnd, [&rightCoords](const PieceInfo& info) {
+            return info.coords == rightCoords;
+        }) == blacklistEnd) {
+            const Piece& rightPiece = getPiece(rightCoords);
+            if (!rightPiece.empty() && rightPiece.color == color) {
+                adjacentPieces[adjacentPiecesCount].coords = rightCoords;
+                adjacentPieces[adjacentPiecesCount].value = rightPiece.value;
+                adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesCount = findEmptyAdjacentPieces(
+                        adjacentPieces[adjacentPiecesCount].emptyAdjacentPlaces, rightCoords);
+                adjacentPiecesCount++;
+            }
         }
     }
     // check up
     if (coords.row > 0) {
         const Coords upCoords = coords - Coords(1, 0);
-        const Piece& upPiece = getPiece(upCoords);
-        if (!upPiece.empty() && upPiece.color == color) {
-            adjacentPieces[adjacentPiecesCount].adjacentPieceCoords = upCoords;
-            adjacentPieces[adjacentPiecesCount].adjacentPieceValue = upPiece.value;
-            adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPieceSize = findEmptyAdjacentPieces(
-                    adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPiece, upCoords);
-            adjacentPiecesCount++;
+        if (std::find_if(blacklistBegin, blacklistEnd, [&upCoords](const PieceInfo& info) {
+            return info.coords == upCoords;
+        }) == blacklistEnd) {
+            const Piece& upPiece = getPiece(upCoords);
+            if (!upPiece.empty() && upPiece.color == color) {
+                adjacentPieces[adjacentPiecesCount].coords = upCoords;
+                adjacentPieces[adjacentPiecesCount].value = upPiece.value;
+                adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesCount = findEmptyAdjacentPieces(
+                        adjacentPieces[adjacentPiecesCount].emptyAdjacentPlaces, upCoords);
+                adjacentPiecesCount++;
+            }
         }
     }
     // check down
     if (coords.row < 3) {
         const Coords downCoords = coords + Coords(1, 0);
-        const Piece& downPiece = getPiece(downCoords);
-        if (!downPiece.empty() && downPiece.color == color) {
-            adjacentPieces[adjacentPiecesCount].adjacentPieceCoords = downCoords;
-            adjacentPieces[adjacentPiecesCount].adjacentPieceValue = downPiece.value;
-            adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPieceSize = findEmptyAdjacentPieces(
-                    adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesOfAdjacentPiece, downCoords);
-            adjacentPiecesCount++;
+        if (std::find_if(blacklistBegin, blacklistEnd, [&downCoords](const PieceInfo& info) {
+            return info.coords == downCoords;
+        }) == blacklistEnd) {
+            const Piece& downPiece = getPiece(downCoords);
+            if (!downPiece.empty() && downPiece.color == color) {
+                adjacentPieces[adjacentPiecesCount].coords = downCoords;
+                adjacentPieces[adjacentPiecesCount].value = downPiece.value;
+                adjacentPieces[adjacentPiecesCount].emptyAdjacentPlacesCount = findEmptyAdjacentPieces(
+                        adjacentPieces[adjacentPiecesCount].emptyAdjacentPlaces, downCoords);
+                adjacentPiecesCount++;
+            }
         }
     }
     return adjacentPiecesCount;
 }
 
-size_t Board::findEmptyAdjacentPieces(Coords adjacentEmptyPieces[3], const Coords& coords) const {
+size_t Board::findEmptyAdjacentPieces(Coords adjacentEmptyPieces[], const Coords& coords) const {
     std::size_t adjacentPiecesCount = 0;
     // check left
     if (coords.column > 0) {
