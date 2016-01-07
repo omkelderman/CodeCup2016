@@ -438,7 +438,7 @@ std::size_t Board::getClustorOfPiecesWithSameColor(const Coords& coords, PieceCo
 
     for (std::size_t i = 0; i < clusterSize; ++i) {
         // add new adjecent dingen
-        clusterSize += findAdjecentPiecesWithSameColor(pieceInfos[i].coords, color, &pieceInfos[i + 1], pieceInfos,
+        clusterSize += findAdjecentPiecesWithSameColor(pieceInfos[i].coords, color, &pieceInfos[clusterSize], pieceInfos,
                                                        pieceInfos + clusterSize);
     }
 
