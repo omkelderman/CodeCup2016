@@ -4,6 +4,8 @@
 #include "Board.h"
 #include "Move.h"
 
+#include <deque>
+
 class Simulation {
     friend class MonteCarloAlgorithm;
 public:
@@ -27,14 +29,9 @@ public:
 
     void removeFirstTwo();
     std::size_t getMovesCount() const;
-//private:
-    Move moves[1000];
+private:
+    std::deque<Move> moves;
     std::uint32_t maxScore;
-
-    Move* startPointer;
-    Move* endPointer;
-
-    static void copyMoves(const Simulation& source, Simulation& destination);
 };
 
 
